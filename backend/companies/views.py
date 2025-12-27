@@ -10,6 +10,7 @@ from .models import Company
 from .serializers import (
     CompanyPublicSerializer,
     CompanyDashboardSerializer,
+    CompanySettingsSerializer,
     CompanyStatusSerializer,
     CompanyAdminSerializer,
     CompanyCreateSerializer
@@ -58,6 +59,21 @@ class CompanyDashboardView(APIView):
                 'available_now': queue_status['available_count']
             }
         })
+
+
+class CompanySettingsView(APIView):
+    """Update settings (slots, max queue)"""
+    
+    permission_classes = [IsCompanyToken]
+    
+    def patch(self, request, token):
+        print(f"DEBUG: CompanySettingsView patch called with data: {request.data}")
+        company = request.company
+        serializer = CompanySettingsSerializer(company, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class CompanyStatusView(APIView):

@@ -111,6 +111,8 @@ export const companyAPI = {
 export const companyDashboardAPI = {
     getDashboard: (token) => api.get(`/companies/${token}/`),
     updateStatus: (token, status) => api.patch(`/companies/${token}/status/`, { status }),
+    updateSettings: (token, data) => api.patch(`/companies/${token}/settings/`, data),
+    getNextStudent: (token) => api.post(`/company/${token}/queues/next/`),
     completeInterview: (token, queueId) => api.post(`/company/${token}/queues/${queueId}/complete/`),
 }
 

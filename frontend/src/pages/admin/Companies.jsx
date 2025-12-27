@@ -18,7 +18,11 @@ export default function AdminCompanies() {
     const { isConnected } = useWebSocket()
 
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
-    const [newCompany, setNewCompany] = useState({ name: '', max_concurrent_interviews: 3 })
+    const [newCompany, setNewCompany] = useState({
+        name: '',
+        max_concurrent_interviews: 3,
+        max_queue_size: null
+    })
 
     // Fetch companies
     const { data: companies, isLoading } = useQuery({
@@ -54,7 +58,7 @@ export default function AdminCompanies() {
             queryClient.invalidateQueries({ queryKey: ['admin-companies'] })
             showToast('Entreprise créée', 'success')
             setIsCreateModalOpen(false)
-            setNewCompany({ name: '', max_concurrent_interviews: 3 })
+            setNewCompany({ name: '', max_concurrent_interviews: 3, max_queue_size: null })
         },
         onError: () => showToast('Erreur lors de la création', 'error')
     })
@@ -131,9 +135,24 @@ export default function AdminCompanies() {
                                 <label className="block text-sm font-medium mb-1">Slots d'entretien simultanés</label>
                                 <input
                                     type="number"
+                                    min="1"
                                     className="w-full p-2 border rounded"
                                     value={newCompany.max_concurrent_interviews}
                                     onChange={e => setNewCompany({ ...newCompany, max_concurrent_interviews: parseInt(e.target.value) })}
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium mb-1">Limite file d'attente (optionnel)</label>
+                                <input
+                                    type="number"
+                                    min="0"
+                                    className="w-full p-2 border rounded"
+                                    value={newCompany.max_queue_size || ''}
+                                    placeholder="Illimité"
+                                    onChange={e => setNewCompany({
+                                        ...newCompany,
+                                        max_queue_size: e.target.value ? parseInt(e.target.value) : null
+                                    })}
                                 />
                             </div>
                             <div className="flex justify-end gap-2 mt-4">

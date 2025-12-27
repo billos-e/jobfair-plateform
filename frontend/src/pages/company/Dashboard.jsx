@@ -10,7 +10,7 @@ import { wsClient } from '../../services/websocket'
 import Card, { CardTitle } from '../../components/ui/Card'
 import Button from '../../components/ui/Button'
 import { StatusBadge } from '../../components/ui/Badge'
-import { Play, Pause, UserCheck, Clock, Users, Check } from 'lucide-react'
+import { Play, Pause, UserCheck, Clock, Users, Check, Settings } from 'lucide-react'
 
 export default function CompanyDashboard() {
     const { token } = useParams()
@@ -55,6 +55,36 @@ export default function CompanyDashboard() {
     })
 
     // Complete mutation
+    // Settings state
+    const [isSettingsOpen, setIsSettingsOpen] = useState(false)
+    const [settingsForm, setSettingsForm] = useState({
+        max_concurrent_interviews: 1,
+        max_queue_size: null
+    })
+
+    // Update form when data loaded
+    useEffect(() => {
+        if (data?.company) {
+            setSettingsForm({
+                max_concurrent_interviews: data.company.max_concurrent_interviews,
+                max_queue_size: data.company.max_queue_size
+            })
+        }
+    }, [data])
+
+    // Settings mutation
+    const settingsMutation = useMutation({
+        mutationFn: (data) => companyDashboardAPI.updateSettings(token, data),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['company-dashboard', token] })
+            setIsSettingsOpen(false)
+        },
+        onError: (err) => {
+            console.error(err)
+            alert('Erreur lors de la mise à jour des paramètres')
+        }
+    })
+
     const completeMutation = useMutation({
         mutationFn: (queueId) => companyDashboardAPI.completeInterview(token, queueId),
         onSuccess: () => {
@@ -122,6 +152,13 @@ export default function CompanyDashboard() {
                                 Reprendre
                             </Button>
                         )}
+                        <Button
+                            variant="outline"
+                            icon={Settings}
+                            onClick={() => setIsSettingsOpen(true)}
+                        >
+                            Paramètres
+                        </Button>
                     </div>
                 </div>
             </header>
@@ -234,6 +271,62 @@ export default function CompanyDashboard() {
                     </Card>
                 </div>
             </div>
+            {/* Settings Modal */}
+            {isSettingsOpen && (
+                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+                    <Card className="w-full max-w-md">
+                        <h2 className="text-xl font-bold mb-4">Paramètres</h2>
+                        <div className="space-y-4">
+                            <div>
+                                <label className="block text-sm font-medium mb-1">
+                                    Slots d&apos;entretien simultanés
+                                </label>
+                                <input
+                                    type="number"
+                                    min="1"
+                                    className="w-full p-2 border rounded"
+                                    value={settingsForm.max_concurrent_interviews}
+                                    onChange={e => setSettingsForm({
+                                        ...settingsForm,
+                                        max_concurrent_interviews: parseInt(e.target.value)
+                                    })}
+                                />
+                                <p className="text-xs text-neutral-500 mt-1">
+                                    Nombre d&apos;interviews en parallèle
+                                </p>
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium mb-1">
+                                    Limite file d&apos;attente (optionnel)
+                                </label>
+                                <input
+                                    type="number"
+                                    min="0"
+                                    className="w-full p-2 border rounded"
+                                    value={settingsForm.max_queue_size || ''}
+                                    placeholder="Illimité"
+                                    onChange={e => setSettingsForm({
+                                        ...settingsForm,
+                                        max_queue_size: e.target.value ? parseInt(e.target.value) : null
+                                    })}
+                                />
+                                <p className="text-xs text-neutral-500 mt-1">
+                                    Laisser vide pour illimité
+                                </p>
+                            </div>
+                            <div className="flex justify-end gap-2 mt-4">
+                                <Button variant="ghost" onClick={() => setIsSettingsOpen(false)}>Annuler</Button>
+                                <Button
+                                    onClick={() => settingsMutation.mutate(settingsForm)}
+                                    loading={settingsMutation.isPending}
+                                >
+                                    Enregistrer
+                                </Button>
+                            </div>
+                        </div>
+                    </Card>
+                </div>
+            )}
         </div>
     )
 }

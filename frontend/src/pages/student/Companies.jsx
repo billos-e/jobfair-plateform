@@ -45,6 +45,11 @@ export default function StudentCompanies() {
         return queues?.some(q => q.company === companyId && !q.is_completed)
     }
 
+    // Check if already passed interview
+    const isPassed = (companyId) => {
+        return queues?.some(q => q.company === companyId && q.is_completed)
+    }
+
     if (isLoading) {
         return (
             <div className="flex items-center justify-center h-64">
@@ -102,6 +107,11 @@ export default function StudentCompanies() {
                                         <Button variant="ghost" className="w-full" disabled>
                                             <Check size={18} />
                                             Inscrit
+                                        </Button>
+                                    ) : isPassed(company.id) ? (
+                                        <Button variant="ghost" className="w-full bg-neutral-100 text-neutral-500" disabled>
+                                            <Check size={18} />
+                                            Passé
                                         </Button>
                                     ) : (
                                         <Button
