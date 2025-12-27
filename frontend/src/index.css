@@ -1,0 +1,237 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ===================================
+   JobFair Platform - Design System
+   Based on P2 Section 2
+   =================================== */
+
+/* Base styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  background-color: #fafafa;
+  color: #18181b;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Typography */
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f4f4f5;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #d4d4d8;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a1a1aa;
+}
+
+/* Focus styles for accessibility */
+:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+/* ===================================
+   Component Layer - Custom classes
+   =================================== */
+
+@layer components {
+  /* Button base */
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 px-4 py-2.5 
+           font-medium rounded-lg transition-all duration-200
+           focus-visible:ring-2 focus-visible:ring-offset-2
+           disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .btn-primary {
+    @apply btn bg-primary-500 text-white hover:bg-primary-600 
+           focus-visible:ring-primary-500 active:bg-primary-700;
+  }
+
+  .btn-success {
+    @apply btn bg-success-500 text-white hover:bg-success-600 
+           focus-visible:ring-success-500 active:bg-success-700;
+  }
+
+  .btn-danger {
+    @apply btn bg-danger-500 text-white hover:bg-danger-600 
+           focus-visible:ring-danger-500 active:bg-danger-700;
+  }
+
+  .btn-ghost {
+    @apply btn bg-transparent text-neutral-700 hover:bg-neutral-100 
+           focus-visible:ring-neutral-500;
+  }
+
+  .btn-outline {
+    @apply btn border-2 border-neutral-300 text-neutral-700 
+           hover:border-neutral-400 hover:bg-neutral-50
+           focus-visible:ring-neutral-500;
+  }
+
+  /* Cards */
+  .card {
+    @apply bg-white rounded-xl shadow-card p-4 transition-shadow duration-200;
+  }
+
+  .card-hover {
+    @apply card hover:shadow-card-hover;
+  }
+
+  /* Badges */
+  .badge {
+    @apply inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium;
+  }
+
+  .badge-available {
+    @apply badge bg-success-100 text-success-700;
+  }
+
+  .badge-interview {
+    @apply badge bg-primary-100 text-primary-700;
+  }
+
+  .badge-paused {
+    @apply badge bg-warning-100 text-warning-700;
+  }
+
+  .badge-completed {
+    @apply badge bg-neutral-100 text-neutral-600;
+  }
+
+  .badge-recruiting {
+    @apply badge bg-success-100 text-success-700;
+  }
+
+  /* Form inputs */
+  .input {
+    @apply w-full px-4 py-2.5 border border-neutral-300 rounded-lg
+           focus:border-primary-500 focus:ring-2 focus:ring-primary-100
+           placeholder:text-neutral-400 transition-colors duration-200;
+  }
+
+  .input-error {
+    @apply input border-danger-500 focus:border-danger-500 focus:ring-danger-100;
+  }
+
+  /* Section headers */
+  .section-header {
+    @apply text-lg font-semibold text-neutral-900 mb-4;
+  }
+
+  /* Status indicator dot */
+  .status-dot {
+    @apply w-2 h-2 rounded-full;
+  }
+
+  .status-dot-available {
+    @apply status-dot bg-success-500;
+  }
+
+  .status-dot-interview {
+    @apply status-dot bg-primary-500 animate-pulse;
+  }
+
+  .status-dot-paused {
+    @apply status-dot bg-warning-500;
+  }
+
+  /* Student row in queue (greyed effect per R2) */
+  .student-row {
+    @apply flex items-center gap-3 p-3 rounded-lg transition-colors duration-200;
+  }
+
+  .student-row-available {
+    @apply student-row bg-white hover:bg-neutral-50;
+  }
+
+  .student-row-greyed {
+    @apply student-row bg-neutral-50 opacity-60;
+  }
+
+  .student-row-interview {
+    @apply student-row bg-primary-50 border border-primary-200;
+  }
+
+  /* Toast notifications */
+  .toast {
+    @apply fixed bottom-4 right-4 max-w-sm p-4 rounded-lg shadow-notification
+           animate-slide-in z-50;
+  }
+
+  .toast-success {
+    @apply toast bg-success-500 text-white;
+  }
+
+  .toast-error {
+    @apply toast bg-danger-500 text-white;
+  }
+
+  .toast-info {
+    @apply toast bg-primary-500 text-white;
+  }
+
+  .toast-warning {
+    @apply toast bg-warning-500 text-white;
+  }
+
+  /* Urgent notification (can_start) */
+  .notification-urgent {
+    @apply fixed top-4 left-1/2 -translate-x-1/2 max-w-md p-6 
+           bg-success-500 text-white rounded-2xl shadow-notification
+           animate-slide-in z-50 text-center;
+  }
+}
+
+/* ===================================
+   Utility Layer
+   =================================== */
+
+@layer utilities {
+  /* Text truncation */
+  .truncate-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  /* Scroll container */
+  .scroll-smooth {
+    scroll-behavior: smooth;
+  }
+
+  /* Hide scrollbar but keep functionality */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+}
