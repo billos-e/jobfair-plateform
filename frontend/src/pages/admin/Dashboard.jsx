@@ -6,10 +6,12 @@ import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { adminAPI } from '../../services/api'
 import { useWebSocket } from '../../contexts/WebSocketContext'
 import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import Card, { CardTitle } from '../../components/ui/Card'
 import { Users, Building2, Clock, Activity, Loader2 } from 'lucide-react'
 
 export default function AdminDashboard() {
+    const navigate = useNavigate()
     const queryClient = useQueryClient()
     const { isConnected } = useWebSocket()
     const [activityFeed, setActivityFeed] = useState([])
@@ -137,7 +139,11 @@ export default function AdminDashboard() {
                             ) : (
                                 <ul className="space-y-2">
                                     {stats.idle_companies.map(c => (
-                                        <li key={c.id} className="text-sm flex justify-between items-center bg-warning-50 p-2 rounded">
+                                        <li
+                                            key={c.id}
+                                            className="text-sm flex justify-between items-center bg-warning-50 p-2 rounded cursor-pointer hover:bg-warning-100 transition-colors"
+                                            onClick={() => navigate(`/admin/companies/${c.id}`)}
+                                        >
                                             <span className="font-medium text-neutral-900">{c.name}</span>
                                             <span className="text-xs text-warning-700 px-2 py-1 bg-white rounded-full border border-warning-200">
                                                 0 entretien
@@ -161,7 +167,11 @@ export default function AdminDashboard() {
                             ) : (
                                 <ul className="space-y-2">
                                     {stats.idle_students.map(s => (
-                                        <li key={s.id} className="text-sm flex justify-between items-center bg-neutral-50 p-2 rounded">
+                                        <li
+                                            key={s.id}
+                                            className="text-sm flex justify-between items-center bg-neutral-50 p-2 rounded cursor-pointer hover:bg-neutral-100 transition-colors"
+                                            onClick={() => navigate(`/admin/students/${s.id}`)}
+                                        >
                                             <span className="font-medium text-neutral-900">{s.first_name} {s.last_name}</span>
                                             <span className="text-xs text-neutral-500 px-2 py-1 bg-white rounded-full border border-neutral-200">
                                                 {s.status}

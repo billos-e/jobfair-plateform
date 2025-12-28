@@ -25,12 +25,13 @@ class AdminDashboardView(APIView):
         if waiting_count < 0: waiting_count = 0
         
         # Idle detection
-        # Companies recruiting but with NO active interview
+        # Companies recruiting, WITH waiting students, but NO active interview
         idle_companies = Company.objects.filter(
-            status='recruiting'
+            status='recruiting',
+            queue_entries__is_completed=False  # Has entries not completed
         ).exclude(
-            queue_entries__student__status='in_interview'
-        ).values('id', 'name', 'status')
+            queue_entries__student__status='in_interview' # But none are in interview
+        ).distinct().values('id', 'name', 'status')
         
         # Idle Students: No active queue entries (not waiting, not in interview)
         # Assuming they are not 'in_interview' and have no IS_COMPLETED=False queue entries

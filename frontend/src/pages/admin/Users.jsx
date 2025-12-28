@@ -27,8 +27,8 @@ export default function AdminUsers() {
                     <button
                         onClick={() => setActiveTab('students')}
                         className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${activeTab === 'students'
-                                ? 'bg-white text-neutral-900 shadow-sm'
-                                : 'text-neutral-500 hover:text-neutral-900'
+                            ? 'bg-white text-neutral-900 shadow-sm'
+                            : 'text-neutral-500 hover:text-neutral-900'
                             }`}
                     >
                         Étudiants
@@ -36,8 +36,8 @@ export default function AdminUsers() {
                     <button
                         onClick={() => setActiveTab('companies')}
                         className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${activeTab === 'companies'
-                                ? 'bg-white text-neutral-900 shadow-sm'
-                                : 'text-neutral-500 hover:text-neutral-900'
+                            ? 'bg-white text-neutral-900 shadow-sm'
+                            : 'text-neutral-500 hover:text-neutral-900'
                             }`}
                     >
                         Entreprises
@@ -111,7 +111,7 @@ function StudentsList() {
                                     {student.first_name} {student.last_name}
                                 </td>
                                 <td className="px-6 py-4 text-neutral-500">
-                                    {student.user?.email}
+                                    {student.email}
                                 </td>
                                 <td className="px-6 py-4">
                                     <StatusBadge status={student.status} />

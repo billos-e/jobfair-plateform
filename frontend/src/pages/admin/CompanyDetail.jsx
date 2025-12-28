@@ -10,7 +10,7 @@ import Card, { CardTitle } from '../../components/ui/Card'
 import Button from '../../components/ui/Button'
 import { StatusBadge } from '../../components/ui/Badge'
 import { useToast } from '../../contexts/ToastContext'
-import { ArrowLeft, Save, RefreshCw, Trash2, Users, Clock, Play, Pause, ChevronUp, ChevronDown, CheckCircle } from 'lucide-react'
+import { ArrowLeft, Save, RefreshCw, Trash2, Users, Clock, Play, Pause, ChevronUp, ChevronDown, CheckCircle, Plus, Search, X } from 'lucide-react'
 
 export default function AdminCompanyDetail() {
     const { id } = useParams()
@@ -20,6 +20,7 @@ export default function AdminCompanyDetail() {
 
     const [isEditing, setIsEditing] = useState(false)
     const [editForm, setEditForm] = useState({})
+    const [isAddStudentModalOpen, setIsAddStudentModalOpen] = useState(false)
 
     // Fetch Company Info
     const { data: company, isLoading: isLoadingCompany } = useQuery({
@@ -76,6 +77,16 @@ export default function AdminCompanyDetail() {
             queryClient.invalidateQueries({ queryKey: ['admin-company-queue', id] })
             showToast('File réorganisée', 'success')
         }
+    })
+
+    const forceAddMutation = useMutation({
+        mutationFn: (studentId) => adminAPI.forceAddStudent(id, { student_id: studentId }),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['admin-company-queue', id] })
+            showToast('Étudiant ajouté à la file', 'success')
+            setIsAddStudentModalOpen(false)
+        },
+        onError: (err) => showToast(err.response?.data?.detail || 'Erreur lors de l\'ajout', 'error')
     })
 
     if (isLoadingCompany || isLoadingQueue) return <div className="text-center py-8">Chargement...</div>
@@ -168,6 +179,9 @@ export default function AdminCompanyDetail() {
                                     <Button size="sm" variant="outline" icon={RefreshCw} onClick={() => {
                                         if (confirm('Régénérer le token ?')) tokenMutation.mutate()
                                     }}>Régénérer Token</Button>
+                                    <Button size="sm" icon={Plus} onClick={() => setIsAddStudentModalOpen(true)}>
+                                        Inscrire un étudiant
+                                    </Button>
                                 </div>
                             </div>
                         </div>
@@ -186,7 +200,12 @@ export default function AdminCompanyDetail() {
                                 <ul className="space-y-2">
                                     {queue.in_interview.map(item => (
                                         <li key={item.student_id} className="p-3 bg-primary-50 rounded flex justify-between items-center">
-                                            <span className="font-medium text-primary-900">{item.student_name}</span>
+                                            <span
+                                                className="font-medium text-primary-900 cursor-pointer hover:underline"
+                                                onClick={() => navigate(`/admin/students/${item.student_id}`)}
+                                            >
+                                                {item.student_name}
+                                            </span>
                                             <span className="text-xs bg-white text-primary-600 px-2 py-1 rounded border border-primary-200">En cours</span>
                                         </li>
                                     ))}
@@ -210,7 +229,12 @@ export default function AdminCompanyDetail() {
                                                     {item.position}
                                                 </span>
                                                 <div>
-                                                    <p className="font-medium text-neutral-900">{item.student_name}</p>
+                                                    <p
+                                                        className="font-medium text-neutral-900 cursor-pointer hover:underline"
+                                                        onClick={() => navigate(`/admin/students/${item.student_id}`)}
+                                                    >
+                                                        {item.student_name}
+                                                    </p>
                                                     <p className="text-xs text-neutral-500">Statut: {item.student_status}</p>
                                                 </div>
                                             </div>
@@ -260,6 +284,73 @@ export default function AdminCompanyDetail() {
                     </Card>
                 </div>
             </div>
+
+            {/* Force Add Student Modal */}
+            {isAddStudentModalOpen && (
+                <AddStudentModal
+                    onClose={() => setIsAddStudentModalOpen(false)}
+                    onSelect={(studentId) => forceAddMutation.mutate(studentId)}
+                />
+            )}
+        </div>
+    )
+}
+
+function AddStudentModal({ onClose, onSelect }) {
+    const [search, setSearch] = useState('')
+
+    // Fetch all students (simplified for now)
+    const { data: students, isLoading } = useQuery({
+        queryKey: ['admin-students-list'],
+        queryFn: () => adminAPI.listStudents().then(res => res.data),
+    })
+
+    const filtered = students?.filter(s =>
+        s.first_name.toLowerCase().includes(search.toLowerCase()) ||
+        s.last_name.toLowerCase().includes(search.toLowerCase()) ||
+        s.email?.toLowerCase().includes(search.toLowerCase())
+    )
+
+    return (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+            <Card className="w-full max-w-lg max-h-[80vh] flex flex-col">
+                <div className="flex justify-between items-center mb-4">
+                    <h2 className="text-xl font-bold">Inscrire un étudiant</h2>
+                    <button onClick={onClose} className="text-neutral-400 hover:text-neutral-600"><X /></button>
+                </div>
+
+                <div className="relative mb-4">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400" size={18} />
+                    <input
+                        className="w-full pl-10 p-2 border rounded"
+                        placeholder="Rechercher (Nom, Email)..."
+                        value={search}
+                        onChange={e => setSearch(e.target.value)}
+                        autoFocus
+                    />
+                </div>
+
+                <div className="overflow-y-auto flex-1 space-y-2 min-h-[200px]">
+                    {isLoading ? <div className="text-center py-4">Chargement...</div> : (
+                        filtered?.length === 0 ? <p className="text-center text-neutral-400 py-4">Aucun étudiant trouvé</p> : (
+                            filtered?.map(student => (
+                                <div key={student.id} className="flex justify-between items-center p-2 hover:bg-neutral-50 rounded border border-transparent hover:border-neutral-200">
+                                    <div>
+                                        <p className="font-medium">{student.first_name} {student.last_name}</p>
+                                        <p className="text-xs text-neutral-500">{student.email}</p>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <StatusBadge status={student.status} />
+                                        <Button size="sm" onClick={() => onSelect(student.id)}>
+                                            Ajouter
+                                        </Button>
+                                    </div>
+                                </div>
+                            ))
+                        )
+                    )}
+                </div>
+            </Card>
         </div>
     )
 }

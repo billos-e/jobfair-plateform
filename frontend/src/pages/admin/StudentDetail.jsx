@@ -150,7 +150,12 @@ export default function AdminStudentDetail() {
                                     {student.queue_entries?.map((entry) => (
                                         <tr key={entry.id} className="hover:bg-neutral-50">
                                             <td className="px-4 py-3 font-medium text-neutral-900">
-                                                {entry.company_name}
+                                                <span
+                                                    className="cursor-pointer hover:text-primary-600 hover:underline"
+                                                    onClick={() => navigate(`/admin/companies/${entry.company_id}`)}
+                                                >
+                                                    {entry.company_name}
+                                                </span>
                                             </td>
                                             <td className="px-4 py-3">
                                                 {entry.status === 'completed' && <span className="text-xs bg-neutral-100 text-neutral-600 px-2 py-1 rounded">Passé</span>}
