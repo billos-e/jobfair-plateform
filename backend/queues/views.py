@@ -6,7 +6,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.generics import ListCreateAPIView
 from django.shortcuts import get_object_or_404
-from core.permissions import IsStudent, IsCompanyToken
+from core.permissions import IsStudent, IsCompanyToken, IsOwnerOrAdmin
 from .models import Queue
 from .services import QueueService
 from .serializers import (
@@ -157,3 +157,19 @@ class StudentOpportunitiesView(APIView):
             'opportunities': result,
             'can_start_any': any(o['can_start'] for o in opportunities)
         })
+
+
+class QueueDetailView(APIView):
+    """
+    R11, Admin: Delete queue entry
+    DELETE /api/queues/{id}/
+    """
+    permission_classes = [IsOwnerOrAdmin]
+    
+    def delete(self, request, pk):
+        queue_entry = get_object_or_404(Queue, pk=pk)
+        self.check_object_permissions(request, queue_entry)
+        
+        QueueService.cancel_inscription(queue_entry)
+        
+        return Response(status=status.HTTP_204_NO_CONTENT)

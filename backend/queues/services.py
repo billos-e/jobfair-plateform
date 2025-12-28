@@ -268,4 +268,25 @@ class QueueService:
                 'ahead_count': QueueService.get_students_ahead_count(entry)
             })
         
+        
         return sorted(opportunities, key=lambda x: (-x['can_start'], x['position']))
+
+    @staticmethod
+    @transaction.atomic
+    def cancel_inscription(queue_entry):
+        """
+        Cancel an inscription mechanism
+        Safe delete handling student status if needed
+        """
+        student = queue_entry.student
+        company = queue_entry.company
+        
+        # If currently interviewing at this company
+        if student.current_company_id == company.id:
+            # Force end interview
+            student.status = 'available' # Or paused? Let's default to available so they are free
+            student.current_company = None
+            student.save()
+            
+        queue_entry.delete()
+        return True

@@ -1,0 +1,186 @@
+/**
+ * Admin Management Page
+ * Matrix view of companies and their queues
+ */
+import { useState } from 'react'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { adminAPI } from '../../services/api'
+import Card from '../../components/ui/Card'
+import Button from '../../components/ui/Button'
+import { StatusBadge } from '../../components/ui/Badge'
+import { ChevronDown, ChevronUp, Play, Pause, Users, Clock, Loader2, AlertCircle } from 'lucide-react'
+
+export default function AdminManagement() {
+    const queryClient = useQueryClient()
+    const [expandedCompany, setExpandedCompany] = useState(null)
+
+    // Fetch companies list
+    const { data: companies, isLoading } = useQuery({
+        queryKey: ['admin-companies'],
+        queryFn: () => adminAPI.listCompanies().then(res => res.data),
+    })
+
+    // Actions
+    const pauseMutation = useMutation({
+        mutationFn: (id) => adminAPI.pauseCompany(id),
+        onSuccess: () => queryClient.invalidateQueries({ queryKey: ['admin-companies'] })
+    })
+
+    const resumeMutation = useMutation({
+        mutationFn: (id) => adminAPI.resumeCompany(id),
+        onSuccess: () => queryClient.invalidateQueries({ queryKey: ['admin-companies'] })
+    })
+
+    const toggleExpand = (id) => {
+        setExpandedCompany(expandedCompany === id ? null : id)
+    }
+
+    if (isLoading) {
+        return (
+            <div className="flex items-center justify-center h-64">
+                <Loader2 className="animate-spin text-primary-500" size={32} />
+            </div>
+        )
+    }
+
+    return (
+        <div className="space-y-6">
+            <div className="flex items-center justify-between">
+                <div>
+                    <h1 className="text-2xl font-bold text-neutral-900">Gestion Live</h1>
+                    <p className="text-neutral-500 mt-1">Pilotage des files d&apos;attente et statuts</p>
+                </div>
+                {/* Global Actions (Placeholder for now) */}
+                <div className="flex gap-2">
+                    {/* Add global actions logic later if needed */}
+                </div>
+            </div>
+
+            <Card className="overflow-hidden p-0">
+                <table className="w-full text-left border-collapse">
+                    <thead className="bg-neutral-50 border-b border-neutral-200">
+                        <tr>
+                            <th className="px-6 py-4 text-sm font-semibold text-neutral-700 w-8"></th>
+                            <th className="px-6 py-4 text-sm font-semibold text-neutral-700">Entreprise</th>
+                            <th className="px-6 py-4 text-sm font-semibold text-neutral-700">Statut</th>
+                            <th className="px-6 py-4 text-sm font-semibold text-neutral-700 text-center">En cours</th>
+                            <th className="px-6 py-4 text-sm font-semibold text-neutral-700 text-center">Attente</th>
+                            <th className="px-6 py-4 text-sm font-semibold text-neutral-700 text-right">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody className="divide-y divide-neutral-100">
+                        {companies?.map(company => (
+                            <>
+                                <tr key={company.id} className="hover:bg-neutral-50 transition-colors">
+                                    <td className="px-6 py-4">
+                                        <button
+                                            onClick={() => toggleExpand(company.id)}
+                                            className="text-neutral-400 hover:text-primary-600"
+                                        >
+                                            {expandedCompany === company.id ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+                                        </button>
+                                    </td>
+                                    <td className="px-6 py-4 font-medium text-neutral-900">{company.name}</td>
+                                    <td className="px-6 py-4">
+                                        <div className="group relative inline-block">
+                                            <StatusBadge status={company.status} />
+                                            {/* Quick Action Hover */}
+                                            <div className="absolute left-full ml-2 top-1/2 -translate-y-1/2 hidden group-hover:flex bg-white shadow-lg rounded-lg border border-neutral-200 p-1 z-10">
+                                                {company.status === 'recruiting' ? (
+                                                    <Button size="xs" variant="ghost" icon={Pause} onClick={() => pauseMutation.mutate(company.id)}>Pause</Button>
+                                                ) : (
+                                                    <Button size="xs" variant="success" icon={Play} onClick={() => resumeMutation.mutate(company.id)}>Reprendre</Button>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td className="px-6 py-4 text-center">
+                                        <span className="inline-flex items-center gap-1 font-medium text-primary-600">
+                                            <Users size={16} />
+                                            {company.current_interview_count}
+                                        </span>
+                                    </td>
+                                    <td className="px-6 py-4 text-center">
+                                        <span className="inline-flex items-center gap-1 font-medium text-warning-600">
+                                            <Clock size={16} />
+                                            {company.queue_length}
+                                        </span>
+                                    </td>
+                                    <td className="px-6 py-4 text-right">
+                                        <Button variant="outline" size="sm" onClick={() => window.open(company.access_url, '_blank')}>
+                                            Voir Dashboard
+                                        </Button>
+                                    </td>
+                                </tr>
+                                {/* Expanded Row Details */}
+                                {expandedCompany === company.id && (
+                                    <tr className="bg-neutral-50/50">
+                                        <td colSpan="6" className="px-6 py-4">
+                                            <CompanyQueueDetails companyId={company.id} />
+                                        </td>
+                                    </tr>
+                                )}
+                            </>
+                        ))}
+                    </tbody>
+                </table>
+            </Card>
+        </div>
+    )
+}
+
+// Subcomponent for fetching and displaying detailed queue
+function CompanyQueueDetails({ companyId }) {
+    const { data, isLoading, error } = useQuery({
+        queryKey: ['admin-company-queue', companyId],
+        queryFn: () => adminAPI.getCompanyQueue(companyId).then(res => res.data),
+    })
+
+    if (isLoading) return <div className="text-center py-4"><Loader2 className="animate-spin inline mr-2" /> Chargement...</div>
+    if (error) return <div className="text-danger-500 py-4"><AlertCircle className="inline mr-2" /> Erreur chargement</div>
+
+    const { in_interview, waiting } = data
+
+    return (
+        <div className="grid md:grid-cols-2 gap-4 pl-8">
+            <div className="bg-white p-4 rounded-lg border border-neutral-200 shadow-sm">
+                <h4 className="text-xs font-bold uppercase text-neutral-500 mb-3 flex items-center gap-2">
+                    <Users size={14} /> En Entretien ({in_interview.length})
+                </h4>
+                {in_interview.length === 0 ? <p className="text-sm text-neutral-400">Aucun entretien</p> : (
+                    <ul className="space-y-2">
+                        {in_interview.map(student => (
+                            <li key={student.student_id} className="text-sm flex justify-between items-center bg-primary-50 p-2 rounded">
+                                <span className="font-medium">{student.student_name}</span>
+                                <span className="text-xs bg-white px-2 py-0.5 rounded text-primary-700 border border-primary-200">En cours</span>
+                            </li>
+                        ))}
+                    </ul>
+                )}
+            </div>
+
+            <div className="bg-white p-4 rounded-lg border border-neutral-200 shadow-sm">
+                <h4 className="text-xs font-bold uppercase text-neutral-500 mb-3 flex items-center gap-2">
+                    <Clock size={14} /> File d&apos;attente ({waiting.length})
+                </h4>
+                {waiting.length === 0 ? <p className="text-sm text-neutral-400">File vide</p> : (
+                    <ul className="space-y-2">
+                        {waiting.map(student => (
+                            <li key={student.student_id} className="text-sm flex justify-between items-center group hover:bg-neutral-50 p-2 rounded transition-colors">
+                                <div className="flex items-center gap-3">
+                                    <span className="w-5 h-5 flex items-center justify-center bg-neutral-100 rounded-full text-xs font-mono text-neutral-500">
+                                        {student.position}
+                                    </span>
+                                    <span>{student.student_name}</span>
+                                </div>
+                                <span className={`text-xs px-2 py-0.5 rounded border ${student.student_status === 'available' ? 'bg-success-50 text-success-700 border-success-200' : 'bg-neutral-100 text-neutral-500 border-neutral-200'}`}>
+                                    {student.student_status}
+                                </span>
+                            </li>
+                        ))}
+                    </ul>
+                )}
+            </div>
+        </div>
+    )
+}

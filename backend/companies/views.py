@@ -156,3 +156,67 @@ class CompanyAdminViewSet(viewsets.ModelViewSet):
                 'available_now': status['available_count']
             }
         })
+
+    @action(detail=True, methods=['post'])
+    def reorder_queue(self, request, pk=None):
+        """
+        Reorder student in queue
+        Body: { "queue_id": 123, "new_position": 5 }
+        """
+        company = self.get_object()
+        queue_id = request.data.get('queue_id')
+        new_position = request.data.get('new_position')
+        
+        try:
+            queue_item = Queue.objects.get(id=queue_id, company=company)
+            # Basic reorder logic: Remove from old pos, insert at new
+            # For simplicity, we can swap or shift. 
+            # Ideally, use a library or proper logic. 
+            # Here: simplistic shift.
+            old_position = queue_item.position
+            if old_position == new_position:
+                return Response({'status': 'unchanged'})
+            
+            # Shift others
+            if old_position < new_position:
+                Queue.objects.filter(
+                    company=company, 
+                    position__gt=old_position, 
+                    position__lte=new_position
+                ).update(position=models.F('position') - 1)
+            else:
+                Queue.objects.filter(
+                    company=company, 
+                    position__gte=new_position, 
+                    position__lt=old_position
+                ).update(position=models.F('position') + 1)
+                
+            queue_item.position = new_position
+            queue_item.save()
+            
+            return Response({'status': 'reordered'})
+        except Queue.DoesNotExist:
+            return Response({'error': 'Queue item not found'}, status=404)
+
+    @action(detail=True, methods=['post'])
+    def force_add_student(self, request, pk=None):
+        """
+        Admin forces student into queue
+        Body: { "student_id": 456 }
+        """
+        company = self.get_object()
+        student_id = request.data.get('student_id')
+        
+        from students.models import Student
+        from queues.serializers import QueueCreateSerializer
+        
+        student = get_object_or_404(Student, id=student_id)
+        
+        # Check if already exists
+        if Queue.objects.filter(company=company, student=student).exists():
+             return Response({'error': 'Student already in queue'}, status=400)
+             
+        # Create without normal validation (admin override)
+        # But we still use save() logic for position
+        Queue.objects.create(company=company, student=student)
+        return Response({'status': 'added'})

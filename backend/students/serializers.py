@@ -82,11 +82,26 @@ class StudentAdminSerializer(serializers.ModelSerializer):
         allow_null=True
     )
     
+    queue_entries = serializers.SerializerMethodField()
+    
     class Meta:
         model = Student
         fields = [
             'id', 'first_name', 'last_name', 'email',
-            'status', 'current_company', 'current_company_name'
+            'status', 'current_company', 'current_company_name',
+            'queue_entries'
         ]
-        read_only_fields = ['id', 'email', 'current_company', 'current_company_name']
+        read_only_fields = ['id', 'email', 'current_company', 'current_company_name', 'queue_entries']
+
+    def get_queue_entries(self, obj):
+        """Return structured queue history"""
+        entries = obj.queue_entries.select_related('company').order_by('is_completed', 'created_at')
+        return [{
+            'id': e.id,
+            'company_id': e.company.id,
+            'company_name': e.company.name,
+            'status': 'completed' if e.is_completed else ('in_interview' if e.company == obj.current_company else 'waiting'),
+            'position': e.position,
+            'created_at': e.created_at
+        } for e in entries]
 
