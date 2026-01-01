@@ -4,9 +4,9 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
-import Button from '../../components/ui/Button'
 import Input from '../../components/ui/Input'
 import Card from '../../components/ui/Card'
+import { Eye, EyeOff } from 'lucide-react'
 
 export default function Register() {
     const [formData, setFormData] = useState({
@@ -16,6 +16,8 @@ export default function Register() {
         first_name: '',
         last_name: '',
     })
+    const [showPassword, setShowPassword] = useState(false)
+    const [showPasswordConfirm, setShowPasswordConfirm] = useState(false)
     const [error, setError] = useState('')
     const [loading, setLoading] = useState(false)
     const { register } = useAuth()
@@ -99,25 +101,43 @@ export default function Register() {
                         required
                     />
 
-                    <Input
-                        label="Mot de passe"
-                        type="password"
-                        name="password"
-                        value={formData.password}
-                        onChange={handleChange}
-                        placeholder="••••••••"
-                        required
-                    />
+                    <div className="relative">
+                        <Input
+                            label="Mot de passe"
+                            type={showPassword ? 'text' : 'password'}
+                            name="password"
+                            value={formData.password}
+                            onChange={handleChange}
+                            placeholder="••••••••"
+                            required
+                        />
+                        <button
+                            type="button"
+                            className="absolute right-3 top-[38px] text-neutral-400 hover:text-neutral-600"
+                            onClick={() => setShowPassword(!showPassword)}
+                        >
+                            {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                        </button>
+                    </div>
 
-                    <Input
-                        label="Confirmer le mot de passe"
-                        type="password"
-                        name="password_confirm"
-                        value={formData.password_confirm}
-                        onChange={handleChange}
-                        placeholder="••••••••"
-                        required
-                    />
+                    <div className="relative">
+                        <Input
+                            label="Confirmer le mot de passe"
+                            type={showPasswordConfirm ? 'text' : 'password'}
+                            name="password_confirm"
+                            value={formData.password_confirm}
+                            onChange={handleChange}
+                            placeholder="••••••••"
+                            required
+                        />
+                        <button
+                            type="button"
+                            className="absolute right-3 top-[38px] text-neutral-400 hover:text-neutral-600"
+                            onClick={() => setShowPasswordConfirm(!showPasswordConfirm)}
+                        >
+                            {showPasswordConfirm ? <EyeOff size={20} /> : <Eye size={20} />}
+                        </button>
+                    </div>
 
                     <Button
                         type="submit"
