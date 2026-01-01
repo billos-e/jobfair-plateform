@@ -108,7 +108,7 @@ export default function AdminCompanyDetail() {
         mutationFn: ({ studentId, status }) => adminAPI.updateStudent(studentId, { status }),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin-company-queue', id] })
-            showToast('Statut étudiant mis à jour', 'success')
+            // showToast('Statut étudiant mis à jour', 'success')
         },
         onError: () => showToast('Erreur mise à jour étudiant', 'error')
     })
