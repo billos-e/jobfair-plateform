@@ -115,17 +115,26 @@ export default function AdminManagement() {
                                             {company.name}
                                         </span>
                                     </td>
-                                    <td className="px-6 py-4 relative">
-                                        <div className="flex items-center gap-2">
+                                    <td className="px-6 py-4">
+                                        <div className="flex items-center gap-2 group/status">
                                             <StatusBadge status={company.status} />
-                                            {/* Action On Row Hover */}
-                                            <div className="opacity-0 group-hover:opacity-100 transition-opacity flex gap-1 absolute left-32 top-1/2 -translate-y-1/2 bg-white shadow-sm border border-neutral-200 rounded p-1">
-                                                {company.status === 'recruiting' ? (
-                                                    <Button size="xs" variant="ghost" icon={Pause} onClick={() => pauseMutation.mutate(company.id)}>Pause</Button>
-                                                ) : (
-                                                    <Button size="xs" variant="success" icon={Play} onClick={() => resumeMutation.mutate(company.id)}>Reprendre</Button>
-                                                )}
-                                            </div>
+                                            {company.status === 'recruiting' ? (
+                                                <button
+                                                    onClick={() => pauseMutation.mutate(company.id)}
+                                                    className="p-1 text-neutral-400 hover:text-warning-600 hover:bg-warning-50 rounded transition-all opacity-0 group-hover:opacity-100"
+                                                    title="Mettre en pause"
+                                                >
+                                                    <Pause size={14} />
+                                                </button>
+                                            ) : (
+                                                <button
+                                                    onClick={() => resumeMutation.mutate(company.id)}
+                                                    className="p-1 text-neutral-400 hover:text-success-600 hover:bg-success-50 rounded transition-all opacity-0 group-hover:opacity-100"
+                                                    title="Reprendre"
+                                                >
+                                                    <Play size={14} />
+                                                </button>
+                                            )}
                                         </div>
                                     </td>
                                     <td className="px-6 py-4 text-center">
