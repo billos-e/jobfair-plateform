@@ -69,6 +69,14 @@ function StudentsList() {
         }
     })
 
+    const bulkAvailableMutation = useMutation({
+        mutationFn: () => adminAPI.bulkAvailableStudents(),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['admin-students'] })
+            showToast('Tous les étudiants sont maintenant disponibles', 'success')
+        }
+    })
+
     const filteredStudents = students?.filter(s =>
         s.first_name.toLowerCase().includes(search.toLowerCase()) ||
         s.last_name.toLowerCase().includes(search.toLowerCase())
@@ -88,6 +96,15 @@ function StudentsList() {
                         onChange={(e) => setSearch(e.target.value)}
                     />
                 </div>
+                <Button
+                    variant="outline"
+                    icon={RefreshCw}
+                    onClick={() => {
+                        if (confirm('Passer TOUS les étudiants à disponible ?')) bulkAvailableMutation.mutate()
+                    }}
+                >
+                    Tout rendre disponible
+                </Button>
             </div>
 
             <Card padding="none" className="overflow-hidden">
@@ -169,6 +186,14 @@ function CompaniesList() {
         }
     })
 
+    const bulkResumeMutation = useMutation({
+        mutationFn: () => adminAPI.bulkResumeCompanies(),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['admin-companies'] })
+            showToast('Toutes les entreprises sont en recrutement', 'success')
+        }
+    })
+
     const filteredCompanies = companies?.filter(c =>
         c.name.toLowerCase().includes(search.toLowerCase())
     )
@@ -187,7 +212,18 @@ function CompaniesList() {
                         onChange={(e) => setSearch(e.target.value)}
                     />
                 </div>
-                <Button onClick={() => setIsCreateModalOpen(true)} icon={Plus}>Ajouter</Button>
+                <div className="flex gap-2">
+                    <Button
+                        variant="outline"
+                        icon={Play}
+                        onClick={() => {
+                            if (confirm('Lancer le recrutement pour TOUTES les entreprises ?')) bulkResumeMutation.mutate()
+                        }}
+                    >
+                        Tout lancer
+                    </Button>
+                    <Button onClick={() => setIsCreateModalOpen(true)} icon={Plus}>Ajouter</Button>
+                </div>
             </div>
 
             {/* Create Modal */}

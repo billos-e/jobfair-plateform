@@ -223,3 +223,12 @@ class CompanyAdminViewSet(viewsets.ModelViewSet):
         # But we still use save() logic for position
         Queue.objects.create(company=company, student=student)
         return Response({'status': 'added'})
+
+    @action(detail=False, methods=['post'], url_path='bulk-resume')
+    def bulk_resume(self, request):
+        """Set all companies to 'recruiting' status"""
+        updated_count = Company.objects.all().update(status='recruiting')
+        return Response({
+            'message': f'Updated {updated_count} companies to recruiting',
+            'updated': updated_count
+        })

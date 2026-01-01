@@ -136,6 +136,7 @@ export const adminAPI = {
     createStudent: (data) => api.post('/students/admin/students/', data),
     updateStudent: (id, data) => api.patch(`/students/admin/students/${id}/`, data),
     deleteStudent: (id) => api.delete(`/students/admin/students/${id}/`),
+    bulkAvailableStudents: () => api.post('/students/admin/students/bulk-available/'),
     deleteQueueEntry: (queueId) => api.delete(`/queues/${queueId}/`),
 
     // Companies
@@ -144,6 +145,7 @@ export const adminAPI = {
     createCompany: (data) => api.post('/companies/admin/companies/', data),
     updateCompany: (id, data) => api.patch(`/companies/admin/companies/${id}/`, data),
     deleteCompany: (id) => api.delete(`/companies/admin/companies/${id}/`),
+    bulkResumeCompanies: () => api.post('/companies/admin/companies/bulk-resume/'),
     regenerateToken: (id) => api.post(`/companies/admin/companies/${id}/regenerate_token/`),
     pauseCompany: (id) => api.post(`/companies/admin/companies/${id}/pause/`),
     resumeCompany: (id) => api.post(`/companies/admin/companies/${id}/resume/`),
