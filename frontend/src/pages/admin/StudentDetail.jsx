@@ -10,7 +10,7 @@ import Card, { CardTitle } from '../../components/ui/Card'
 import Button from '../../components/ui/Button'
 import { StatusBadge } from '../../components/ui/Badge'
 import { useToast } from '../../contexts/ToastContext'
-import { ArrowLeft, User, Mail, Trash2, Save, X, Hash } from 'lucide-react'
+import { ArrowLeft, User, Mail, Trash2, Save, X, Hash, Play, Pause } from 'lucide-react'
 
 export default function AdminStudentDetail() {
     const { id } = useParams()
@@ -18,8 +18,6 @@ export default function AdminStudentDetail() {
     const queryClient = useQueryClient()
     const { showToast } = useToast()
 
-    const [isEditingStatus, setIsEditingStatus] = useState(false)
-    const [newStatus, setNewStatus] = useState('')
 
     // Fetch Student Info
     const { data: student, isLoading } = useQuery({
@@ -32,8 +30,7 @@ export default function AdminStudentDetail() {
         mutationFn: (status) => adminAPI.updateStudent(id, { status }),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin-student', id] })
-            showToast('Statut mis à jour', 'success')
-            setIsEditingStatus(false)
+            // showToast('Statut mis à jour', 'success')
         },
         onError: () => showToast('Erreur mise à jour', 'error')
     })
@@ -45,6 +42,15 @@ export default function AdminStudentDetail() {
             showToast('Inscription annulée', 'success')
         },
         onError: () => showToast('Erreur annulation', 'error')
+    })
+
+    const deleteStudentMutation = useMutation({
+        mutationFn: () => adminAPI.deleteStudent(id),
+        onSuccess: () => {
+            showToast('Étudiant supprimé', 'success')
+            navigate('/admin/users')
+        },
+        onError: () => showToast('Erreur lors de la suppression', 'error')
     })
 
     // Mutation to change position directly from here
@@ -73,12 +79,26 @@ export default function AdminStudentDetail() {
 
     return (
         <div className="space-y-6">
-            <div className="flex items-center gap-4">
-                <Button variant="ghost" onClick={() => navigate('/admin/users')}>
-                    <ArrowLeft className="mr-2" size={20} /> Retour
+            <div className="flex items-center justify-between gap-4">
+                <div className="flex items-center gap-4">
+                    <Button variant="ghost" onClick={() => navigate('/admin/users')}>
+                        <ArrowLeft className="mr-2" size={20} /> Retour
+                    </Button>
+                    <h1 className="text-2xl font-bold text-neutral-900">{student.first_name} {student.last_name}</h1>
+                    <StatusBadge status={student.status} />
+                </div>
+                <Button
+                    variant="danger"
+                    icon={Trash2}
+                    loading={deleteStudentMutation.isPending}
+                    onClick={() => {
+                        if (window.confirm('Êtes-vous sûr de vouloir supprimer cet étudiant ? Cette action est irréversible.')) {
+                            deleteStudentMutation.mutate()
+                        }
+                    }}
+                >
+                    Supprimer
                 </Button>
-                <h1 className="text-2xl font-bold text-neutral-900">{student.first_name} {student.last_name}</h1>
-                <StatusBadge status={student.status} />
             </div>
 
             <div className="grid lg:grid-cols-3 gap-6">
@@ -93,33 +113,38 @@ export default function AdminStudentDetail() {
 
                         <div className="pt-4 border-t border-neutral-100">
                             <p className="text-xs text-neutral-500 uppercase font-bold mb-2">Statut</p>
-                            {isEditingStatus ? (
-                                <div className="flex gap-2">
-                                    <select
-                                        className="p-2 border rounded text-sm w-full"
-                                        value={newStatus || student.status}
-                                        onChange={(e) => setNewStatus(e.target.value)}
-                                    >
-                                        <option value="available">Disponible</option>
-                                        <option value="paused">En pause</option>
-                                        {/* Cannot force 'in_interview' here easily provided logic, stick to basic */}
-                                    </select>
-                                    <Button size="sm" onClick={() => updateStatusMutation.mutate(newStatus || student.status)} icon={Save}></Button>
-                                    <Button size="sm" variant="ghost" onClick={() => setIsEditingStatus(false)} icon={X}></Button>
-                                </div>
-                            ) : (
-                                <div className="flex justify-between items-center">
-                                    <span className="capitalize font-medium">{student.status}</span>
-                                    {student.status !== 'in_interview' && (
-                                        <Button size="sm" variant="ghost" onClick={() => setIsEditingStatus(true)}>Modifier</Button>
+                            <div className="flex flex-col gap-2">
+                                <div className="flex items-center justify-between">
+                                    <StatusBadge status={student.status} />
+                                    {student.status === 'available' && (
+                                        <Button
+                                            size="sm"
+                                            variant="outline"
+                                            icon={Pause}
+                                            onClick={() => updateStatusMutation.mutate('paused')}
+                                            loading={updateStatusMutation.isPending}
+                                        >
+                                            Mettre en pause
+                                        </Button>
+                                    )}
+                                    {student.status === 'paused' && (
+                                        <Button
+                                            size="sm"
+                                            variant="success"
+                                            icon={Play}
+                                            onClick={() => updateStatusMutation.mutate('available')}
+                                            loading={updateStatusMutation.isPending}
+                                        >
+                                            Passer Disponible
+                                        </Button>
                                     )}
                                 </div>
-                            )}
-                            {student.status === 'in_interview' && (
-                                <p className="text-xs text-primary-600 mt-1">
-                                    En entretien chez <strong>{student.current_company_name}</strong>
-                                </p>
-                            )}
+                                {student.status === 'in_interview' && (
+                                    <p className="text-xs text-primary-600">
+                                        En entretien chez <strong>{student.current_company_name}</strong>
+                                    </p>
+                                )}
+                            </div>
                         </div>
                     </div>
                 </Card>

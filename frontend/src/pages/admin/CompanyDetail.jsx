@@ -10,7 +10,7 @@ import Card, { CardTitle } from '../../components/ui/Card'
 import Button from '../../components/ui/Button'
 import { StatusBadge } from '../../components/ui/Badge'
 import { useToast } from '../../contexts/ToastContext'
-import { ArrowLeft, Save, RefreshCw, Trash2, Users, Clock, Play, Pause, ChevronUp, ChevronDown, CheckCircle, Plus, Search, X } from 'lucide-react'
+import { ArrowLeft, Save, RefreshCw, Trash2, Users, Clock, Play, Pause, ChevronUp, ChevronDown, CheckCircle, Plus, Search, X, Copy } from 'lucide-react'
 
 export default function AdminCompanyDetail() {
     const { id } = useParams()
@@ -69,6 +69,21 @@ export default function AdminCompanyDetail() {
         }
     })
 
+    const deleteCompanyMutation = useMutation({
+        mutationFn: () => adminAPI.deleteCompany(id),
+        onSuccess: () => {
+            showToast('Entreprise supprimée', 'success')
+            navigate('/admin/management') // Redirect to management or users? User said from "users" before but management is matrix. Matrix is good.
+        },
+        onError: () => showToast('Erreur lors de la suppression', 'error')
+    })
+
+    const copyDashboardLink = () => {
+        const url = `${window.location.origin}/company/${company.access_token}`
+        navigator.clipboard.writeText(url)
+        showToast('Lien copié dans le presse-papier', 'success')
+    }
+
     // Queue Actions
     const reorderMutation = useMutation({
         mutationFn: ({ queue_id, new_position }) =>
@@ -103,12 +118,35 @@ export default function AdminCompanyDetail() {
 
     return (
         <div className="space-y-6">
-            <div className="flex items-center gap-4">
-                <Button variant="ghost" onClick={() => navigate('/admin/users')}>
-                    <ArrowLeft className="mr-2" size={20} /> Retour
-                </Button>
-                <h1 className="text-2xl font-bold text-neutral-900">{company.name}</h1>
-                <StatusBadge status={company.status} />
+            <div className="flex items-center justify-between gap-4">
+                <div className="flex items-center gap-4">
+                    <Button variant="ghost" onClick={() => navigate('/admin/management')}>
+                        <ArrowLeft className="mr-2" size={20} /> Retour
+                    </Button>
+                    <h1 className="text-2xl font-bold text-neutral-900">{company.name}</h1>
+                    <StatusBadge status={company.status} />
+                </div>
+                <div className="flex items-center gap-2">
+                    <Button
+                        variant="outline"
+                        icon={Copy}
+                        onClick={copyDashboardLink}
+                    >
+                        Copier Lien Live
+                    </Button>
+                    <Button
+                        variant="danger"
+                        icon={Trash2}
+                        loading={deleteCompanyMutation.isPending}
+                        onClick={() => {
+                            if (window.confirm('Êtes-vous sûr de vouloir supprimer cette entreprise ? Cette action est irréversible.')) {
+                                deleteCompanyMutation.mutate()
+                            }
+                        }}
+                    >
+                        Supprimer
+                    </Button>
+                </div>
             </div>
 
             <div className="grid lg:grid-cols-3 gap-6">

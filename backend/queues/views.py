@@ -170,6 +170,9 @@ class QueueDetailView(APIView):
         queue_entry = get_object_or_404(Queue, pk=pk)
         self.check_object_permissions(request, queue_entry)
         
+        # Trigger notification before deletion so we have the data
+        NotificationService.on_queue_cancel(queue_entry)
+        
         QueueService.cancel_inscription(queue_entry)
         
         return Response(status=status.HTTP_204_NO_CONTENT)
