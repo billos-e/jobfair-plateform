@@ -144,7 +144,7 @@ function CompaniesList() {
     const { showToast } = useToast()
     const [search, setSearch] = useState('')
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
-    const [newCompany, setNewCompany] = useState({ name: '', max_concurrent_interviews: 3, max_queue_size: null })
+    const [newCompany, setNewCompany] = useState({ name: '', max_concurrent_interviews: 1, max_queue_size: null })
 
     const { data: companies, isLoading } = useQuery({
         queryKey: ['admin-companies'],
@@ -157,7 +157,7 @@ function CompaniesList() {
             queryClient.invalidateQueries({ queryKey: ['admin-companies'] })
             showToast('Entreprise créée', 'success')
             setIsCreateModalOpen(false)
-            setNewCompany({ name: '', max_concurrent_interviews: 3, max_queue_size: null })
+            setNewCompany({ name: '', max_concurrent_interviews: 1, max_queue_size: null })
         }
     })
 
