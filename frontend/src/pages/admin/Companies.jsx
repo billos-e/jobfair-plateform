@@ -20,7 +20,7 @@ export default function AdminCompanies() {
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
     const [newCompany, setNewCompany] = useState({
         name: '',
-        max_concurrent_interviews: 3,
+        max_concurrent_interviews: 1,
         max_queue_size: null
     })
 
@@ -58,7 +58,7 @@ export default function AdminCompanies() {
             queryClient.invalidateQueries({ queryKey: ['admin-companies'] })
             showToast('Entreprise créée', 'success')
             setIsCreateModalOpen(false)
-            setNewCompany({ name: '', max_concurrent_interviews: 3, max_queue_size: null })
+            setNewCompany({ name: '', max_concurrent_interviews: 1, max_queue_size: null })
         },
         onError: () => showToast('Erreur lors de la création', 'error')
     })
