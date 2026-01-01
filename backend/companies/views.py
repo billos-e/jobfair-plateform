@@ -20,6 +20,11 @@ from queues.services import QueueService
 from queues.serializers import QueueCompanySerializer
 from notifications.services import NotificationService
 
+from django.db import models
+from students.models import Student
+from queues.serializers import QueueCreateSerializer
+from django.shortcuts import get_object_or_404
+
 
 class CompanyListView(APIView):
     """
@@ -207,8 +212,6 @@ class CompanyAdminViewSet(viewsets.ModelViewSet):
         company = self.get_object()
         student_id = request.data.get('student_id')
         
-        from students.models import Student
-        from queues.serializers import QueueCreateSerializer
         
         student = get_object_or_404(Student, id=student_id)
         
