@@ -111,7 +111,23 @@ export default function AdminCompanies() {
     return (
         <div className="space-y-6">
             <div className="flex items-center justify-between">
-                <h1 className="text-2xl font-bold text-neutral-900">Gestion Entreprises</h1>
+                <div className="flex items-center gap-4">
+                    <h1 className="text-2xl font-bold text-neutral-900">Gestion Entreprises</h1>
+                    <div className={`flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium border ${isConnected ? 'bg-success-50 text-success-600 border-success-100' : 'bg-neutral-50 text-neutral-400 border-neutral-100'}`}>
+                        <div className={`w-2 h-2 rounded-full ${isConnected ? 'bg-success-500 animate-pulse' : 'bg-neutral-300'}`} />
+                        {isConnected ? 'Live' : (
+                            <div className="flex items-center gap-2">
+                                <span>Déconnecté</span>
+                                <button
+                                    onClick={() => import('../../services/websocket').then(m => m.wsClient.reconnect())}
+                                    className="text-primary-600 hover:underline font-bold"
+                                >
+                                    Relancer
+                                </button>
+                            </div>
+                        )}
+                    </div>
+                </div>
                 <Button onClick={() => setIsCreateModalOpen(true)}>
                     Ajouter une entreprise
                 </Button>

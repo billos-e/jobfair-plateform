@@ -86,7 +86,17 @@ export default function StudentDashboard() {
                     </div>
                     <div className={`hidden sm:flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium ${isConnected ? 'bg-success-50 text-success-600 border border-success-100' : 'bg-neutral-50 text-neutral-400 border border-neutral-100'}`}>
                         <div className={`w-2 h-2 rounded-full ${isConnected ? 'bg-success-500 animate-pulse' : 'bg-neutral-300'}`} />
-                        {isConnected ? 'Temps Réel' : 'Déconnecté'}
+                        {isConnected ? 'Temps Réel' : (
+                            <div className="flex items-center gap-2">
+                                <span>Déconnecté</span>
+                                <button
+                                    onClick={() => wsClient.reconnect()}
+                                    className="text-primary-600 hover:text-primary-700 font-bold underline"
+                                >
+                                    Reconnecter
+                                </button>
+                            </div>
+                        )}
                     </div>
                 </div>
 

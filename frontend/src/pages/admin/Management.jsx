@@ -10,12 +10,14 @@ import Card from '../../components/ui/Card'
 import Button from '../../components/ui/Button'
 import { StatusBadge } from '../../components/ui/Badge'
 import { useToast } from '../../contexts/ToastContext'
-import { ChevronDown, ChevronUp, Play, Pause, Users, Clock, Loader2, AlertCircle, Copy, Link as LinkIcon, ExternalLink } from 'lucide-react'
+import { ChevronDown, ChevronUp, Play, Pause, Users, Clock, Loader2, AlertCircle, Copy, Link as LinkIcon, ExternalLink, Zap } from 'lucide-react'
+import { useWebSocket } from '../../contexts/WebSocketContext'
 
 export default function AdminManagement() {
     const navigate = useNavigate()
     const queryClient = useQueryClient()
     const { showToast } = useToast()
+    const { isConnected } = useWebSocket()
     const [expandedCompany, setExpandedCompany] = useState(null)
 
     // Fetch companies list
@@ -60,6 +62,24 @@ export default function AdminManagement() {
                 <div>
                     <h1 className="text-2xl font-bold text-neutral-900">Gestion Live</h1>
                     <p className="text-neutral-500 mt-1">Pilotage des files d&apos;attente et statuts</p>
+                </div>
+                <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium border border-neutral-200 bg-white shadow-sm">
+                        <div className={`w-2 h-2 rounded-full ${isConnected ? 'bg-success-500 animate-pulse' : 'bg-neutral-300'}`} />
+                        {isConnected ? (
+                            <span className="text-success-600">Live</span>
+                        ) : (
+                            <div className="flex items-center gap-2">
+                                <span className="text-neutral-400">Hors-ligne</span>
+                                <button
+                                    onClick={() => import('../../services/websocket').then(m => m.wsClient.reconnect())}
+                                    className="text-primary-600 hover:underline font-bold"
+                                >
+                                    Relancer
+                                </button>
+                            </div>
+                        )}
+                    </div>
                 </div>
             </div>
 
