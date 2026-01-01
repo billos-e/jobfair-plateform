@@ -104,6 +104,15 @@ export default function AdminCompanyDetail() {
         onError: (err) => showToast(err.response?.data?.detail || 'Erreur lors de l\'ajout', 'error')
     })
 
+    const updateStudentStatusMutation = useMutation({
+        mutationFn: ({ studentId, status }) => adminAPI.updateStudent(studentId, { status }),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['admin-company-queue', id] })
+            showToast('Statut étudiant mis à jour', 'success')
+        },
+        onError: () => showToast('Erreur mise à jour étudiant', 'error')
+    })
+
     if (isLoadingCompany || isLoadingQueue) return <div className="text-center py-8">Chargement...</div>
     if (!company) return <div className="text-center py-8">Entreprise introuvable</div>
 
@@ -273,7 +282,30 @@ export default function AdminCompanyDetail() {
                                                     >
                                                         {item.student_name}
                                                     </p>
-                                                    <p className="text-xs text-neutral-500">Statut: {item.student_status}</p>
+                                                    <div className="flex items-center gap-2 mt-1">
+                                                        <span className={`text-[10px] uppercase font-bold px-1.5 py-0.5 rounded border ${item.student_status === 'available' ? 'bg-success-50 text-success-700 border-success-200' : 'bg-neutral-100 text-neutral-500 border-neutral-200'}`}>
+                                                            {item.student_status}
+                                                        </span>
+                                                        <div className="flex gap-1">
+                                                            {item.student_status === 'available' ? (
+                                                                <button
+                                                                    onClick={() => updateStudentStatusMutation.mutate({ studentId: item.student_id, status: 'paused' })}
+                                                                    className="p-0.5 text-neutral-400 hover:text-warning-600 transition-colors"
+                                                                    title="Mettre en pause"
+                                                                >
+                                                                    <Pause size={12} />
+                                                                </button>
+                                                            ) : (
+                                                                <button
+                                                                    onClick={() => updateStudentStatusMutation.mutate({ studentId: item.student_id, status: 'available' })}
+                                                                    className="p-0.5 text-neutral-400 hover:text-success-600 transition-colors"
+                                                                    title="Passer disponible"
+                                                                >
+                                                                    <Play size={12} />
+                                                                </button>
+                                                            )}
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             </div>
                                             <div className="flex items-center gap-1 opacity-50 group-hover:opacity-100 transition-opacity">
