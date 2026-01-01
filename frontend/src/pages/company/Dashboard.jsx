@@ -32,9 +32,17 @@ export default function CompanyDashboard() {
         wsClient.on('connection', handleConnection)
         wsClient.on('queue_update', handleQueueUpdate)
 
+        const handleVisibilityChange = () => {
+            if (document.visibilityState === 'visible' && !wsClient.isConnected()) {
+                wsClient.reconnect()
+            }
+        }
+        document.addEventListener('visibilitychange', handleVisibilityChange)
+
         return () => {
             wsClient.off('connection', handleConnection)
             wsClient.off('queue_update', handleQueueUpdate)
+            document.removeEventListener('visibilitychange', handleVisibilityChange)
             wsClient.disconnect()
         }
     }, [token, queryClient])
@@ -120,15 +128,22 @@ export default function CompanyDashboard() {
             {/* Header */}
             <header className="bg-white border-b border-neutral-200 px-4 py-4">
                 <div className="max-w-6xl mx-auto flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                    <div>
-                        <h1 className="text-2xl font-bold text-neutral-900">{company.name}</h1>
-                        <div className="flex items-center gap-4 mt-2 text-sm text-neutral-500">
-                            <StatusBadge status={company.status} />
-                            <span className="flex items-center gap-1">
-                                <div className={`w-2 h-2 rounded-full ${wsConnected ? 'bg-success-500' : 'bg-neutral-400'}`} />
-                                {wsConnected ? 'Temps réel actif' : 'Connexion...'}
-                            </span>
+                    <div className="flex items-center gap-4">
+                        <div className={`flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium ${wsConnected ? 'bg-success-50 text-success-600' : 'bg-neutral-100 text-neutral-400'}`}>
+                            <div className={`w-2 h-2 rounded-full ${wsConnected ? 'bg-success-500 animate-pulse' : 'bg-neutral-300'}`} />
+                            {wsConnected ? 'Live' : (
+                                <div className="flex items-center gap-2">
+                                    <span>Déconnecté</span>
+                                    <button
+                                        onClick={() => wsClient.reconnect()}
+                                        className="text-primary-600 hover:underline font-bold"
+                                    >
+                                        Réessayer
+                                    </button>
+                                </div>
+                            )}
                         </div>
+                        <h1 className="text-xl font-bold text-neutral-900">{company.name}</h1>
                     </div>
 
                     {/* Status controls */}
@@ -270,63 +285,65 @@ export default function CompanyDashboard() {
                         </div>
                     </Card>
                 </div>
-            </div>
+            </div >
             {/* Settings Modal */}
-            {isSettingsOpen && (
-                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-                    <Card className="w-full max-w-md">
-                        <h2 className="text-xl font-bold mb-4">Paramètres</h2>
-                        <div className="space-y-4">
-                            <div>
-                                <label className="block text-sm font-medium mb-1">
-                                    Slots d&apos;entretien simultanés
-                                </label>
-                                <input
-                                    type="number"
-                                    min="1"
-                                    className="w-full p-2 border rounded"
-                                    value={settingsForm.max_concurrent_interviews}
-                                    onChange={e => setSettingsForm({
-                                        ...settingsForm,
-                                        max_concurrent_interviews: parseInt(e.target.value)
-                                    })}
-                                />
-                                <p className="text-xs text-neutral-500 mt-1">
-                                    Nombre d&apos;interviews en parallèle
-                                </p>
+            {
+                isSettingsOpen && (
+                    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+                        <Card className="w-full max-w-md">
+                            <h2 className="text-xl font-bold mb-4">Paramètres</h2>
+                            <div className="space-y-4">
+                                <div>
+                                    <label className="block text-sm font-medium mb-1">
+                                        Slots d&apos;entretien simultanés
+                                    </label>
+                                    <input
+                                        type="number"
+                                        min="1"
+                                        className="w-full p-2 border rounded"
+                                        value={settingsForm.max_concurrent_interviews}
+                                        onChange={e => setSettingsForm({
+                                            ...settingsForm,
+                                            max_concurrent_interviews: parseInt(e.target.value)
+                                        })}
+                                    />
+                                    <p className="text-xs text-neutral-500 mt-1">
+                                        Nombre d&apos;interviews en parallèle
+                                    </p>
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium mb-1">
+                                        Limite file d&apos;attente (optionnel)
+                                    </label>
+                                    <input
+                                        type="number"
+                                        min="0"
+                                        className="w-full p-2 border rounded"
+                                        value={settingsForm.max_queue_size || ''}
+                                        placeholder="Illimité"
+                                        onChange={e => setSettingsForm({
+                                            ...settingsForm,
+                                            max_queue_size: e.target.value ? parseInt(e.target.value) : null
+                                        })}
+                                    />
+                                    <p className="text-xs text-neutral-500 mt-1">
+                                        Laisser vide pour illimité
+                                    </p>
+                                </div>
+                                <div className="flex justify-end gap-2 mt-4">
+                                    <Button variant="ghost" onClick={() => setIsSettingsOpen(false)}>Annuler</Button>
+                                    <Button
+                                        onClick={() => settingsMutation.mutate(settingsForm)}
+                                        loading={settingsMutation.isPending}
+                                    >
+                                        Enregistrer
+                                    </Button>
+                                </div>
                             </div>
-                            <div>
-                                <label className="block text-sm font-medium mb-1">
-                                    Limite file d&apos;attente (optionnel)
-                                </label>
-                                <input
-                                    type="number"
-                                    min="0"
-                                    className="w-full p-2 border rounded"
-                                    value={settingsForm.max_queue_size || ''}
-                                    placeholder="Illimité"
-                                    onChange={e => setSettingsForm({
-                                        ...settingsForm,
-                                        max_queue_size: e.target.value ? parseInt(e.target.value) : null
-                                    })}
-                                />
-                                <p className="text-xs text-neutral-500 mt-1">
-                                    Laisser vide pour illimité
-                                </p>
-                            </div>
-                            <div className="flex justify-end gap-2 mt-4">
-                                <Button variant="ghost" onClick={() => setIsSettingsOpen(false)}>Annuler</Button>
-                                <Button
-                                    onClick={() => settingsMutation.mutate(settingsForm)}
-                                    loading={settingsMutation.isPending}
-                                >
-                                    Enregistrer
-                                </Button>
-                            </div>
-                        </div>
-                    </Card>
-                </div>
-            )}
-        </div>
+                        </Card>
+                    </div>
+                )
+            }
+        </div >
     )
 }

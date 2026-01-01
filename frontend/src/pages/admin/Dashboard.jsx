@@ -71,7 +71,17 @@ export default function AdminDashboard() {
                 </div>
                 <div className="flex items-center gap-2 text-sm text-neutral-500">
                     <div className={`w-2 h-2 rounded-full ${isConnected ? 'bg-success-500' : 'bg-neutral-400'}`} />
-                    {isConnected ? 'Connecté au live' : 'Déconnecté'}
+                    {isConnected ? 'Connecté au live' : (
+                        <div className="flex items-center gap-2">
+                            <span>Déconnecté</span>
+                            <button
+                                onClick={() => import('../../services/websocket').then(m => m.wsClient.reconnect())}
+                                className="text-primary-600 hover:text-primary-700 font-bold underline"
+                            >
+                                Reconnecter
+                            </button>
+                        </div>
+                    )}
                 </div>
             </div>
 

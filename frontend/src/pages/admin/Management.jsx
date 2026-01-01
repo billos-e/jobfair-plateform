@@ -10,12 +10,14 @@ import Card from '../../components/ui/Card'
 import Button from '../../components/ui/Button'
 import { StatusBadge } from '../../components/ui/Badge'
 import { useToast } from '../../contexts/ToastContext'
-import { ChevronDown, ChevronUp, Play, Pause, Users, Clock, Loader2, AlertCircle, Copy, Link as LinkIcon, ExternalLink } from 'lucide-react'
+import { ChevronDown, ChevronUp, Play, Pause, Users, Clock, Loader2, AlertCircle, Copy, Link as LinkIcon, ExternalLink, Zap } from 'lucide-react'
+import { useWebSocket } from '../../contexts/WebSocketContext'
 
 export default function AdminManagement() {
     const navigate = useNavigate()
     const queryClient = useQueryClient()
     const { showToast } = useToast()
+    const { isConnected } = useWebSocket()
     const [expandedCompany, setExpandedCompany] = useState(null)
 
     // Fetch companies list
@@ -61,6 +63,24 @@ export default function AdminManagement() {
                     <h1 className="text-2xl font-bold text-neutral-900">Gestion Live</h1>
                     <p className="text-neutral-500 mt-1">Pilotage des files d&apos;attente et statuts</p>
                 </div>
+                <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium border border-neutral-200 bg-white shadow-sm">
+                        <div className={`w-2 h-2 rounded-full ${isConnected ? 'bg-success-500 animate-pulse' : 'bg-neutral-300'}`} />
+                        {isConnected ? (
+                            <span className="text-success-600">Live</span>
+                        ) : (
+                            <div className="flex items-center gap-2">
+                                <span className="text-neutral-400">Hors-ligne</span>
+                                <button
+                                    onClick={() => import('../../services/websocket').then(m => m.wsClient.reconnect())}
+                                    className="text-primary-600 hover:underline font-bold"
+                                >
+                                    Relancer
+                                </button>
+                            </div>
+                        )}
+                    </div>
+                </div>
             </div>
 
             <Card className="overflow-hidden p-0">
@@ -95,17 +115,26 @@ export default function AdminManagement() {
                                             {company.name}
                                         </span>
                                     </td>
-                                    <td className="px-6 py-4 relative">
-                                        <div className="flex items-center gap-2">
+                                    <td className="px-6 py-4">
+                                        <div className="flex items-center gap-2 group/status">
                                             <StatusBadge status={company.status} />
-                                            {/* Action On Row Hover */}
-                                            <div className="opacity-0 group-hover:opacity-100 transition-opacity flex gap-1 absolute left-32 top-1/2 -translate-y-1/2 bg-white shadow-sm border border-neutral-200 rounded p-1">
-                                                {company.status === 'recruiting' ? (
-                                                    <Button size="xs" variant="ghost" icon={Pause} onClick={() => pauseMutation.mutate(company.id)}>Pause</Button>
-                                                ) : (
-                                                    <Button size="xs" variant="success" icon={Play} onClick={() => resumeMutation.mutate(company.id)}>Reprendre</Button>
-                                                )}
-                                            </div>
+                                            {company.status === 'recruiting' ? (
+                                                <button
+                                                    onClick={() => pauseMutation.mutate(company.id)}
+                                                    className="p-1 text-neutral-400 hover:text-warning-600 hover:bg-warning-50 rounded transition-all opacity-0 group-hover:opacity-100"
+                                                    title="Mettre en pause"
+                                                >
+                                                    <Pause size={14} />
+                                                </button>
+                                            ) : (
+                                                <button
+                                                    onClick={() => resumeMutation.mutate(company.id)}
+                                                    className="p-1 text-neutral-400 hover:text-success-600 hover:bg-success-50 rounded transition-all opacity-0 group-hover:opacity-100"
+                                                    title="Reprendre"
+                                                >
+                                                    <Play size={14} />
+                                                </button>
+                                            )}
                                         </div>
                                     </td>
                                     <td className="px-6 py-4 text-center">

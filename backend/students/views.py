@@ -4,6 +4,7 @@ Views for student operations - Updated with notifications
 from rest_framework import status, viewsets
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework.decorators import action
 from core.permissions import IsStudent, IsAdmin
 from .models import Student
 from .serializers import StudentSerializer, StudentStatusSerializer, StudentAdminSerializer
@@ -82,4 +83,13 @@ class StudentAdminViewSet(viewsets.ModelViewSet):
         """Delete associated user account when deleting student profile"""
         user = instance.user
         user.delete()
+
+    @action(detail=False, methods=['post'], url_path='bulk-available')
+    def bulk_available(self, request):
+        """Set all students to 'available' status"""
+        updated_count = Student.objects.all().update(status='available', current_company=None)
+        return Response({
+            'message': f'Updated {updated_count} students to available',
+            'updated': updated_count
+        })
 

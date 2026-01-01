@@ -69,6 +69,14 @@ function StudentsList() {
         }
     })
 
+    const bulkAvailableMutation = useMutation({
+        mutationFn: () => adminAPI.bulkAvailableStudents(),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['admin-students'] })
+            showToast('Tous les étudiants sont maintenant disponibles', 'success')
+        }
+    })
+
     const filteredStudents = students?.filter(s =>
         s.first_name.toLowerCase().includes(search.toLowerCase()) ||
         s.last_name.toLowerCase().includes(search.toLowerCase())
@@ -88,6 +96,15 @@ function StudentsList() {
                         onChange={(e) => setSearch(e.target.value)}
                     />
                 </div>
+                <Button
+                    variant="outline"
+                    icon={RefreshCw}
+                    onClick={() => {
+                        if (confirm('Passer TOUS les étudiants à disponible ?')) bulkAvailableMutation.mutate()
+                    }}
+                >
+                    Tout rendre disponible
+                </Button>
             </div>
 
             <Card padding="none" className="overflow-hidden">
@@ -144,7 +161,7 @@ function CompaniesList() {
     const { showToast } = useToast()
     const [search, setSearch] = useState('')
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
-    const [newCompany, setNewCompany] = useState({ name: '', max_concurrent_interviews: 3, max_queue_size: null })
+    const [newCompany, setNewCompany] = useState({ name: '', max_concurrent_interviews: 1, max_queue_size: null })
 
     const { data: companies, isLoading } = useQuery({
         queryKey: ['admin-companies'],
@@ -157,7 +174,7 @@ function CompaniesList() {
             queryClient.invalidateQueries({ queryKey: ['admin-companies'] })
             showToast('Entreprise créée', 'success')
             setIsCreateModalOpen(false)
-            setNewCompany({ name: '', max_concurrent_interviews: 3, max_queue_size: null })
+            setNewCompany({ name: '', max_concurrent_interviews: 1, max_queue_size: null })
         }
     })
 
@@ -166,6 +183,14 @@ function CompaniesList() {
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin-companies'] })
             showToast('Entreprise supprimée', 'success')
+        }
+    })
+
+    const bulkResumeMutation = useMutation({
+        mutationFn: () => adminAPI.bulkResumeCompanies(),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['admin-companies'] })
+            showToast('Toutes les entreprises sont en recrutement', 'success')
         }
     })
 
@@ -187,7 +212,18 @@ function CompaniesList() {
                         onChange={(e) => setSearch(e.target.value)}
                     />
                 </div>
-                <Button onClick={() => setIsCreateModalOpen(true)} icon={Plus}>Ajouter</Button>
+                <div className="flex gap-2">
+                    <Button
+                        variant="outline"
+                        icon={Play}
+                        onClick={() => {
+                            if (confirm('Lancer le recrutement pour TOUTES les entreprises ?')) bulkResumeMutation.mutate()
+                        }}
+                    >
+                        Tout lancer
+                    </Button>
+                    <Button onClick={() => setIsCreateModalOpen(true)} icon={Plus}>Ajouter</Button>
+                </div>
             </div>
 
             {/* Create Modal */}

@@ -33,11 +33,11 @@ export function ToastProvider({ children }) {
         <ToastContext.Provider value={value}>
             {children}
             {/* Toast container */}
-            <div className="fixed bottom-4 right-4 z-50 flex flex-col gap-2">
+            <div className="fixed bottom-4 right-4 z-50 flex flex-col-reverse gap-2 pointer-events-none">
                 {toasts.map((toast) => (
                     <div
                         key={toast.id}
-                        className={`toast toast-${toast.type} cursor-pointer`}
+                        className={`toast toast-${toast.type} cursor-pointer pointer-events-auto`}
                         onClick={() => hideToast(toast.id)}
                     >
                         {toast.message}

@@ -20,6 +20,11 @@ from queues.services import QueueService
 from queues.serializers import QueueCompanySerializer
 from notifications.services import NotificationService
 
+from django.db import models
+from students.models import Student
+from queues.serializers import QueueCreateSerializer
+from django.shortcuts import get_object_or_404
+
 
 class CompanyListView(APIView):
     """
@@ -207,8 +212,6 @@ class CompanyAdminViewSet(viewsets.ModelViewSet):
         company = self.get_object()
         student_id = request.data.get('student_id')
         
-        from students.models import Student
-        from queues.serializers import QueueCreateSerializer
         
         student = get_object_or_404(Student, id=student_id)
         
@@ -220,3 +223,12 @@ class CompanyAdminViewSet(viewsets.ModelViewSet):
         # But we still use save() logic for position
         Queue.objects.create(company=company, student=student)
         return Response({'status': 'added'})
+
+    @action(detail=False, methods=['post'], url_path='bulk-resume')
+    def bulk_resume(self, request):
+        """Set all companies to 'recruiting' status"""
+        updated_count = Company.objects.all().update(status='recruiting')
+        return Response({
+            'message': f'Updated {updated_count} companies to recruiting',
+            'updated': updated_count
+        })

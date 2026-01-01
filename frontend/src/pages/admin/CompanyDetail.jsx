@@ -104,6 +104,24 @@ export default function AdminCompanyDetail() {
         onError: (err) => showToast(err.response?.data?.detail || 'Erreur lors de l\'ajout', 'error')
     })
 
+    const removeStudentMutation = useMutation({
+        mutationFn: (queueId) => adminAPI.deleteQueueEntry(queueId),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['admin-company-queue', id] })
+            showToast('Étudiant retiré de la file', 'info')
+        },
+        onError: () => showToast('Erreur lors de la suppression', 'error')
+    })
+
+    const updateStudentStatusMutation = useMutation({
+        mutationFn: ({ studentId, status }) => adminAPI.updateStudent(studentId, { status }),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['admin-company-queue', id] })
+            // showToast('Statut étudiant mis à jour', 'success')
+        },
+        onError: () => showToast('Erreur mise à jour étudiant', 'error')
+    })
+
     if (isLoadingCompany || isLoadingQueue) return <div className="text-center py-8">Chargement...</div>
     if (!company) return <div className="text-center py-8">Entreprise introuvable</div>
 
@@ -273,24 +291,64 @@ export default function AdminCompanyDetail() {
                                                     >
                                                         {item.student_name}
                                                     </p>
-                                                    <p className="text-xs text-neutral-500">Statut: {item.student_status}</p>
+                                                    <div className="flex items-center gap-2 mt-1">
+                                                        <span className={`text-[10px] uppercase font-bold px-1.5 py-0.5 rounded border ${item.student_status === 'available' ? 'bg-success-50 text-success-700 border-success-200' : 'bg-neutral-100 text-neutral-500 border-neutral-200'}`}>
+                                                            {item.student_status}
+                                                        </span>
+                                                    </div>
                                                 </div>
                                             </div>
-                                            <div className="flex items-center gap-1 opacity-50 group-hover:opacity-100 transition-opacity">
-                                                <button
-                                                    onClick={() => reorderMutation.mutate({ queue_id: item.queue_id, new_position: item.position - 1 })}
-                                                    disabled={index === 0}
-                                                    className="p-1 hover:bg-neutral-100 rounded disabled:opacity-30"
-                                                >
-                                                    <ChevronUp size={18} />
-                                                </button>
-                                                <button
-                                                    onClick={() => reorderMutation.mutate({ queue_id: item.queue_id, new_position: item.position + 1 })}
-                                                    disabled={index === queue.waiting.length - 1}
-                                                    className="p-1 hover:bg-neutral-100 rounded disabled:opacity-30"
-                                                >
-                                                    <ChevronDown size={18} />
-                                                </button>
+
+                                            <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                <div className="flex gap-1 border-r pr-2 border-neutral-200">
+                                                    {item.student_status === 'available' ? (
+                                                        <button
+                                                            onClick={() => updateStudentStatusMutation.mutate({ studentId: item.student_id, status: 'paused' })}
+                                                            className="p-1.5 text-neutral-400 hover:text-warning-600 hover:bg-warning-50 rounded transition-colors"
+                                                            title="Mettre en pause"
+                                                        >
+                                                            <Pause size={14} />
+                                                        </button>
+                                                    ) : (
+                                                        <button
+                                                            onClick={() => updateStudentStatusMutation.mutate({ studentId: item.student_id, status: 'available' })}
+                                                            className="p-1.5 text-neutral-400 hover:text-success-600 hover:bg-success-50 rounded transition-colors"
+                                                            title="Passer disponible"
+                                                        >
+                                                            <Play size={14} />
+                                                        </button>
+                                                    )}
+                                                </div>
+
+                                                <div className="flex gap-1">
+                                                    <button
+                                                        onClick={() => reorderMutation.mutate({ queue_id: item.id, new_position: item.position - 1 })}
+                                                        disabled={index === 0}
+                                                        className="p-1.5 text-neutral-400 hover:text-primary-600 hover:bg-primary-50 rounded disabled:opacity-30"
+                                                        title="Monter"
+                                                    >
+                                                        <ChevronUp size={16} />
+                                                    </button>
+                                                    <button
+                                                        onClick={() => reorderMutation.mutate({ queue_id: item.id, new_position: item.position + 1 })}
+                                                        disabled={index === queue.waiting.length - 1}
+                                                        className="p-1.5 text-neutral-400 hover:text-primary-600 hover:bg-primary-50 rounded disabled:opacity-30"
+                                                        title="Descendre"
+                                                    >
+                                                        <ChevronDown size={16} />
+                                                    </button>
+                                                    <button
+                                                        onClick={() => {
+                                                            if (window.confirm(`Retirer ${item.student_name} de la file ?`)) {
+                                                                removeStudentMutation.mutate(item.id)
+                                                            }
+                                                        }}
+                                                        className="p-1.5 text-neutral-400 hover:text-danger-600 hover:bg-danger-50 rounded transition-colors ml-1"
+                                                        title="Supprimer la file"
+                                                    >
+                                                        <Trash2 size={16} />
+                                                    </button>
+                                                </div>
                                             </div>
                                         </li>
                                     ))}

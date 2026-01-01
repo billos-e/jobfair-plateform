@@ -83,6 +83,14 @@ export function WebSocketProvider({ children }) {
             queryClient.invalidateQueries({ queryKey: ['admin-stats'] })
         }
 
+        // Visibility change listener for auto-reconnect
+        const handleVisibilityChange = () => {
+            if (document.visibilityState === 'visible' && !wsClient.isConnected()) {
+                console.log('App visible, attempting WebSocket reconnection...')
+                wsClient.reconnect()
+            }
+        }
+
         // Register listeners
         wsClient.on('connection', handleConnection)
         wsClient.on('notification', handleNotification)
@@ -93,6 +101,8 @@ export function WebSocketProvider({ children }) {
         wsClient.on('interview_started', handleQueueUpdate)
         wsClient.on('interview_completed', handleQueueUpdate)
 
+        document.addEventListener('visibilitychange', handleVisibilityChange)
+
         return () => {
             wsClient.off('connection', handleConnection)
             wsClient.off('notification', handleNotification)
@@ -100,6 +110,7 @@ export function WebSocketProvider({ children }) {
             wsClient.off('can_start', handleUrgent)
             wsClient.off('queue_update', handleQueueUpdate)
             wsClient.off('status_change', handleStatusChange)
+            document.removeEventListener('visibilitychange', handleVisibilityChange)
         }
     }, [queryClient, showToast])
 
@@ -108,11 +119,16 @@ export function WebSocketProvider({ children }) {
         wsClient.connect(null, companyToken)
     }, [])
 
+    const reconnect = useCallback(() => {
+        wsClient.reconnect()
+    }, [])
+
     const value = {
         connectionStatus,
         isConnected: connectionStatus === 'connected',
         lastNotification,
         connectWithCompanyToken,
+        reconnect,
     }
 
     return (

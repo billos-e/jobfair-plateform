@@ -179,7 +179,7 @@ h1, h2, h3, h4, h5, h6 {
 
   /* Toast notifications */
   .toast {
-    @apply fixed bottom-4 right-4 max-w-sm p-4 rounded-lg shadow-notification
+    @apply max-w-sm p-4 rounded-lg shadow-notification
            animate-slide-in z-50;
   }
 
