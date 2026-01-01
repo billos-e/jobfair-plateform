@@ -10,7 +10,7 @@ import Card, { CardTitle } from '../../components/ui/Card'
 import Button from '../../components/ui/Button'
 import { StatusBadge } from '../../components/ui/Badge'
 import { useToast } from '../../contexts/ToastContext'
-import { ArrowLeft, User, Mail, Trash2, Save, X, Hash, Play, Pause } from 'lucide-react'
+import { ArrowLeft, User, Mail, Trash2, Save, X, Hash, Play, Pause, ChevronUp, ChevronDown } from 'lucide-react'
 
 export default function AdminStudentDetail() {
     const { id } = useParams()
@@ -192,8 +192,9 @@ export default function AdminStudentDetail() {
                                                     <div className="flex items-center gap-2">
                                                         <Hash size={14} className="text-neutral-400" />
                                                         <input
+                                                            key={`${entry.id}-${entry.position}`}
                                                             type="number"
-                                                            className="w-16 p-1 text-sm border rounded text-center"
+                                                            className="w-12 p-1 text-sm border rounded text-center"
                                                             defaultValue={entry.position}
                                                             onBlur={(e) => {
                                                                 if (parseInt(e.target.value) !== entry.position) {
@@ -204,6 +205,21 @@ export default function AdminStudentDetail() {
                                                                 if (e.key === 'Enter') handlePositionChange(entry, e.currentTarget.value)
                                                             }}
                                                         />
+                                                        <div className="flex flex-col -gap-1">
+                                                            <button
+                                                                onClick={() => handlePositionChange(entry, entry.position - 1)}
+                                                                disabled={entry.position <= 1}
+                                                                className="text-neutral-400 hover:text-primary-600 disabled:opacity-30"
+                                                            >
+                                                                <ChevronUp size={14} />
+                                                            </button>
+                                                            <button
+                                                                onClick={() => handlePositionChange(entry, entry.position + 1)}
+                                                                className="text-neutral-400 hover:text-primary-600"
+                                                            >
+                                                                <ChevronDown size={14} />
+                                                            </button>
+                                                        </div>
                                                     </div>
                                                 ) : (
                                                     <span className="text-neutral-400 text-sm">-</span>

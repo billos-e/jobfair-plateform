@@ -310,14 +310,14 @@ export default function AdminCompanyDetail() {
                                             </div>
                                             <div className="flex items-center gap-1 opacity-50 group-hover:opacity-100 transition-opacity">
                                                 <button
-                                                    onClick={() => reorderMutation.mutate({ queue_id: item.queue_id, new_position: item.position - 1 })}
+                                                    onClick={() => reorderMutation.mutate({ queue_id: item.id, new_position: item.position - 1 })}
                                                     disabled={index === 0}
                                                     className="p-1 hover:bg-neutral-100 rounded disabled:opacity-30"
                                                 >
                                                     <ChevronUp size={18} />
                                                 </button>
                                                 <button
-                                                    onClick={() => reorderMutation.mutate({ queue_id: item.queue_id, new_position: item.position + 1 })}
+                                                    onClick={() => reorderMutation.mutate({ queue_id: item.id, new_position: item.position + 1 })}
                                                     disabled={index === queue.waiting.length - 1}
                                                     className="p-1 hover:bg-neutral-100 rounded disabled:opacity-30"
                                                 >
