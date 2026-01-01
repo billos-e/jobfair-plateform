@@ -66,6 +66,17 @@ class StudentAdminViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAdmin]
     queryset = Student.objects.all().order_by('last_name', 'first_name')
     serializer_class = StudentAdminSerializer
+    
+    def perform_update(self, serializer):
+        """Trigger notification if status changed by admin"""
+        old_status = self.get_object().status
+        instance = serializer.save()
+        new_status = instance.status
+        
+        if old_status != new_status:
+            NotificationService.on_student_status_change(
+                instance, old_status, new_status
+            )
 
     def perform_destroy(self, instance):
         """Delete associated user account when deleting student profile"""

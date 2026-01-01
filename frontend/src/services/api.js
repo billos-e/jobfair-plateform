@@ -132,18 +132,24 @@ export const queueAPI = {
 export const adminAPI = {
     // Students
     listStudents: () => api.get('/students/admin/students/'),
+    getStudent: (id) => api.get(`/students/admin/students/${id}/`),
     createStudent: (data) => api.post('/students/admin/students/', data),
     updateStudent: (id, data) => api.patch(`/students/admin/students/${id}/`, data),
     deleteStudent: (id) => api.delete(`/students/admin/students/${id}/`),
+    deleteQueueEntry: (queueId) => api.delete(`/queues/${queueId}/`),
 
     // Companies
     listCompanies: () => api.get('/companies/admin/companies/'),
+    getCompany: (id) => api.get(`/companies/admin/companies/${id}/`),
     createCompany: (data) => api.post('/companies/admin/companies/', data),
     updateCompany: (id, data) => api.patch(`/companies/admin/companies/${id}/`, data),
     deleteCompany: (id) => api.delete(`/companies/admin/companies/${id}/`),
     regenerateToken: (id) => api.post(`/companies/admin/companies/${id}/regenerate_token/`),
     pauseCompany: (id) => api.post(`/companies/admin/companies/${id}/pause/`),
     resumeCompany: (id) => api.post(`/companies/admin/companies/${id}/resume/`),
+    getCompanyQueue: (id) => api.get(`/companies/admin/companies/${id}/queue/`),
+    reorderQueue: (id, data) => api.post(`/companies/admin/companies/${id}/reorder_queue/`, data),
+    forceAddStudent: (id, data) => api.post(`/companies/admin/companies/${id}/force_add_student/`, data),
 
     // Dashboard
     getDashboard: () => api.get('/admin/dashboard/'),

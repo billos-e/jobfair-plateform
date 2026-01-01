@@ -46,6 +46,11 @@ export function WebSocketProvider({ children }) {
             if (data.data?.message) {
                 showToast(data.data.message, 'info')
             }
+
+            // Student/Admin dashboard usually need refresh on notifications
+            queryClient.invalidateQueries({ queryKey: ['queues'] })
+            queryClient.invalidateQueries({ queryKey: ['opportunities'] })
+            queryClient.invalidateQueries({ queryKey: ['profile'] })
         }
 
         const handleUrgent = (data) => {
@@ -59,6 +64,7 @@ export function WebSocketProvider({ children }) {
             // Invalidate relevant queries
             queryClient.invalidateQueries({ queryKey: ['opportunities'] })
             queryClient.invalidateQueries({ queryKey: ['queues'] })
+            queryClient.invalidateQueries({ queryKey: ['profile'] })
         }
 
         const handleQueueUpdate = (data) => {
@@ -66,12 +72,15 @@ export function WebSocketProvider({ children }) {
             queryClient.invalidateQueries({ queryKey: ['queues'] })
             queryClient.invalidateQueries({ queryKey: ['companies'] })
             queryClient.invalidateQueries({ queryKey: ['dashboard'] })
+            queryClient.invalidateQueries({ queryKey: ['opportunities'] })
+            queryClient.invalidateQueries({ queryKey: ['admin-stats'] })
         }
 
         const handleStatusChange = (data) => {
             // Invalidate profile queries
             queryClient.invalidateQueries({ queryKey: ['profile'] })
             queryClient.invalidateQueries({ queryKey: ['opportunities'] })
+            queryClient.invalidateQueries({ queryKey: ['admin-stats'] })
         }
 
         // Register listeners
@@ -81,6 +90,8 @@ export function WebSocketProvider({ children }) {
         wsClient.on('can_start', handleUrgent)
         wsClient.on('queue_update', handleQueueUpdate)
         wsClient.on('status_change', handleStatusChange)
+        wsClient.on('interview_started', handleQueueUpdate)
+        wsClient.on('interview_completed', handleQueueUpdate)
 
         return () => {
             wsClient.off('connection', handleConnection)

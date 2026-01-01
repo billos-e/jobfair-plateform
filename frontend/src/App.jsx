@@ -16,9 +16,12 @@ import StudentCompanies from './pages/student/Companies'
 import CompanyDashboard from './pages/company/Dashboard'
 
 // Admin pages
+import AdminLayout from './pages/admin/AdminLayout'
 import AdminDashboard from './pages/admin/Dashboard'
-import AdminStudents from './pages/admin/Students'
-import AdminCompanies from './pages/admin/Companies'
+import AdminManagement from './pages/admin/Management'
+import AdminUsers from './pages/admin/Users'
+import AdminCompanyDetail from './pages/admin/CompanyDetail'
+import AdminStudentDetail from './pages/admin/StudentDetail'
 
 /**
  * Protected Route wrapper
@@ -98,36 +101,17 @@ function App() {
             />
 
             {/* Admin routes */}
-            <Route
-                path="/admin"
-                element={
-                    <ProtectedRoute allowedRoles={['admin']}>
-                        <MainLayout>
-                            <AdminDashboard />
-                        </MainLayout>
-                    </ProtectedRoute>
-                }
-            />
-            <Route
-                path="/admin/students"
-                element={
-                    <ProtectedRoute allowedRoles={['admin']}>
-                        <MainLayout>
-                            <AdminStudents />
-                        </MainLayout>
-                    </ProtectedRoute>
-                }
-            />
-            <Route
-                path="/admin/companies"
-                element={
-                    <ProtectedRoute allowedRoles={['admin']}>
-                        <MainLayout>
-                            <AdminCompanies />
-                        </MainLayout>
-                    </ProtectedRoute>
-                }
-            />
+            <Route path="/admin" element={
+                <ProtectedRoute allowedRoles={['admin']}>
+                    <AdminLayout />
+                </ProtectedRoute>
+            }>
+                <Route index element={<AdminDashboard />} />
+                <Route path="management" element={<AdminManagement />} />
+                <Route path="users" element={<AdminUsers />} />
+                <Route path="companies/:id" element={<AdminCompanyDetail />} />
+                <Route path="students/:id" element={<AdminStudentDetail />} />
+            </Route>
 
             {/* Default redirect */}
             <Route path="/" element={<Navigate to="/login" replace />} />

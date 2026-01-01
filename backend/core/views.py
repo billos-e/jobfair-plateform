@@ -3,6 +3,7 @@ Core views
 """
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from django.db.models import Count
 from core.permissions import IsAdmin
 from students.models import Student
 from companies.models import Company
@@ -24,10 +25,29 @@ class AdminDashboardView(APIView):
         waiting_count = Queue.objects.filter(is_completed=False).count() - current_interviews
         if waiting_count < 0: waiting_count = 0
         
+        # Idle detection
+        # Companies recruiting, WITH waiting students, but NO person sitting in interview currently
+        idle_companies = Company.objects.filter(
+            status='recruiting',
+            queue_entries__is_completed=False
+        ).annotate(
+            active_interviews=Count('current_students')
+        ).filter(
+            active_interviews=0
+        ).distinct().values('id', 'name', 'status')
+        
+        # Idle Students: No active queue entries (not waiting, not in interview)
+        # Assuming they are not 'in_interview' and have no IS_COMPLETED=False queue entries
+        idle_students = Student.objects.exclude(
+            queue_entries__is_completed=False
+        ).values('id', 'first_name', 'last_name', 'status')
+
         return Response({
             'total_students': total_students,
             'total_companies': total_companies,
             'total_interviews': total_interviews,
             'current_interviews': current_interviews,
-            'waiting_count': waiting_count
+            'waiting_count': waiting_count,
+            'idle_companies': idle_companies,
+            'idle_students': idle_students
         })
