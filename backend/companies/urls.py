@@ -7,6 +7,7 @@ from .views import (
     CompanyListView,
     CompanyDashboardView,
     CompanyStatusView,
+    CompanySettingsView,
     CompanyAdminViewSet
 )
 
@@ -21,6 +22,7 @@ urlpatterns = [
     # Company token-based endpoints
     path('<str:token>/', CompanyDashboardView.as_view(), name='company_dashboard'),
     path('<str:token>/status/', CompanyStatusView.as_view(), name='company_status'),
+    path('<str:token>/settings/', CompanySettingsView.as_view(), name='company_settings'),
     
     # Admin endpoints (nested under admin/)
     path('admin/', include(admin_router.urls)),

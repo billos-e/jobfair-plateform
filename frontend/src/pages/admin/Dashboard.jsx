@@ -6,10 +6,12 @@ import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { adminAPI } from '../../services/api'
 import { useWebSocket } from '../../contexts/WebSocketContext'
 import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import Card, { CardTitle } from '../../components/ui/Card'
 import { Users, Building2, Clock, Activity, Loader2 } from 'lucide-react'
 
 export default function AdminDashboard() {
+    const navigate = useNavigate()
     const queryClient = useQueryClient()
     const { isConnected } = useWebSocket()
     const [activityFeed, setActivityFeed] = useState([])
@@ -69,7 +71,17 @@ export default function AdminDashboard() {
                 </div>
                 <div className="flex items-center gap-2 text-sm text-neutral-500">
                     <div className={`w-2 h-2 rounded-full ${isConnected ? 'bg-success-500' : 'bg-neutral-400'}`} />
-                    {isConnected ? 'Connecté au live' : 'Déconnecté'}
+                    {isConnected ? 'Connecté au live' : (
+                        <div className="flex items-center gap-2">
+                            <span>Déconnecté</span>
+                            <button
+                                onClick={() => import('../../services/websocket').then(m => m.wsClient.reconnect())}
+                                className="text-primary-600 hover:text-primary-700 font-bold underline"
+                            >
+                                Reconnecter
+                            </button>
+                        </div>
+                    )}
                 </div>
             </div>
 
@@ -99,24 +111,89 @@ export default function AdminDashboard() {
                 </Card>
             </div>
 
-            {/* Activity feed */}
-            <Card>
-                <CardTitle>Activité récente</CardTitle>
-                <div className="mt-4 space-y-4">
-                    {activityFeed.length === 0 ? (
-                        <p className="text-neutral-500 text-center py-4">
-                            En attente d&apos;activité...
-                        </p>
-                    ) : (
-                        activityFeed.map((activity) => (
-                            <div key={activity.id} className="flex items-center gap-3 text-sm border-b border-neutral-100 pb-2 last:border-0">
-                                <span className="text-neutral-400 font-mono text-xs">{activity.timestamp}</span>
-                                <span className="text-neutral-700">{activity.message}</span>
-                            </div>
-                        ))
-                    )}
+            {/* Activity feed and Idle Lists */}
+            <div className="grid lg:grid-cols-2 gap-6">
+                {/* Activity Feed */}
+                <Card className="h-full">
+                    <CardTitle className="flex items-center gap-2">
+                        <Activity className="text-primary-500" size={20} />
+                        Activité récente
+                    </CardTitle>
+                    <div className="mt-4 space-y-4 max-h-96 overflow-y-auto pr-2">
+                        {activityFeed.length === 0 ? (
+                            <p className="text-neutral-500 text-center py-4">
+                                En attente d&apos;activité...
+                            </p>
+                        ) : (
+                            activityFeed.map((activity) => (
+                                <div key={activity.id} className="flex flex-col gap-1 text-sm border-b border-neutral-100 pb-2 last:border-0 hover:bg-neutral-50 p-2 rounded transition-colors">
+                                    <span className="text-neutral-700 font-medium">{activity.message}</span>
+                                    <span className="text-neutral-400 font-mono text-xs">{activity.timestamp}</span>
+                                </div>
+                            ))
+                        )}
+                    </div>
+                </Card>
+
+                {/* Idle Lists */}
+                <div className="space-y-6">
+                    {/* Idle Companies */}
+                    <Card>
+                        <CardTitle className="flex items-center gap-2 text-warning-600">
+                            <Clock size={20} />
+                            Entreprises sans activité ({stats?.idle_companies?.length || 0})
+                        </CardTitle>
+                        <div className="mt-4 max-h-48 overflow-y-auto">
+                            {!stats?.idle_companies?.length ? (
+                                <p className="text-neutral-400 text-sm">Toutes les entreprises sont actives</p>
+                            ) : (
+                                <ul className="space-y-2">
+                                    {stats.idle_companies.map(c => (
+                                        <li
+                                            key={c.id}
+                                            className="text-sm flex justify-between items-center bg-warning-50 p-2 rounded cursor-pointer hover:bg-warning-100 transition-colors"
+                                            onClick={() => navigate(`/admin/companies/${c.id}`)}
+                                        >
+                                            <span className="font-medium text-neutral-900">{c.name}</span>
+                                            <span className="text-xs text-warning-700 px-2 py-1 bg-white rounded-full border border-warning-200">
+                                                0 entretien
+                                            </span>
+                                        </li>
+                                    ))}
+                                </ul>
+                            )}
+                        </div>
+                    </Card>
+
+                    {/* Idle Students */}
+                    <Card>
+                        <CardTitle className="flex items-center gap-2 text-neutral-500">
+                            <Users size={20} />
+                            Étudiants sans file d'attente ({stats?.idle_students?.length || 0})
+                        </CardTitle>
+                        <div className="mt-4 max-h-48 overflow-y-auto">
+                            {!stats?.idle_students?.length ? (
+                                <p className="text-neutral-400 text-sm">Tous les étudiants sont inscrits</p>
+                            ) : (
+                                <ul className="space-y-2">
+                                    {stats.idle_students.map(s => (
+                                        <li
+                                            key={s.id}
+                                            className="text-sm flex justify-between items-center bg-neutral-50 p-2 rounded cursor-pointer hover:bg-neutral-100 transition-colors"
+                                            onClick={() => navigate(`/admin/students/${s.id}`)}
+                                        >
+                                            <span className="font-medium text-neutral-900">{s.first_name} {s.last_name}</span>
+                                            <span className="text-xs text-neutral-500 px-2 py-1 bg-white rounded-full border border-neutral-200">
+                                                {s.status}
+                                            </span>
+                                        </li>
+                                    ))}
+                                </ul>
+                            )}
+                        </div>
+                    </Card>
                 </div>
-            </Card>
+            </div>
         </div>
     )
 }

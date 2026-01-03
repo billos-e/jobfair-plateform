@@ -202,6 +202,29 @@ class NotificationService:
         })
     
     @classmethod
+    def on_queue_cancel(cls, queue_entry):
+        """Notify student that their inscription was cancelled"""
+        student = queue_entry.student
+        company = queue_entry.company
+        
+        cls.notify_student(student, cls.TYPE_QUEUE_UPDATE, {
+            'message': f"Ton inscription chez {company.name} a été annulée.",
+            'company_id': company.id,
+            'action': 'cancelled'
+        })
+        
+        # Notify company and admin
+        cls.notify_company(company, cls.TYPE_QUEUE_UPDATE, {
+            'action': 'cancelled',
+            'student_name': student.full_name
+        })
+        cls.notify_admin(cls.TYPE_QUEUE_UPDATE, {
+            'action': 'cancelled',
+            'student_name': student.full_name,
+            'company_name': company.name
+        })
+    
+    @classmethod
     def on_student_status_change(cls, student, old_status, new_status):
         """
         Handle student status change event

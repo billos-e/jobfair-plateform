@@ -8,11 +8,13 @@ import Card, { CardTitle } from '../../components/ui/Card'
 import Button from '../../components/ui/Button'
 import { StatusBadge } from '../../components/ui/Badge'
 import { useToast } from '../../contexts/ToastContext'
-import { Play, Pause, Clock, Building2, ChevronRight } from 'lucide-react'
+import { Play, Pause, Clock, Building2, ChevronRight, Zap } from 'lucide-react'
+import { useWebSocket } from '../../contexts/WebSocketContext'
 
 export default function StudentDashboard() {
     const queryClient = useQueryClient()
     const { showToast } = useToast()
+    const { isConnected } = useWebSocket()
 
     // Fetch student profile
     const { data: profile, isLoading: profileLoading } = useQuery({
@@ -24,7 +26,6 @@ export default function StudentDashboard() {
     const { data: opportunities, isLoading: opportunitiesLoading } = useQuery({
         queryKey: ['opportunities'],
         queryFn: () => queueAPI.getOpportunities().then(res => res.data),
-        refetchInterval: 30000, // Refetch every 30s
     })
 
     // Fetch queue entries
@@ -39,7 +40,7 @@ export default function StudentDashboard() {
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['profile'] })
             queryClient.invalidateQueries({ queryKey: ['opportunities'] })
-            showToast('Statut mis à jour', 'success')
+            // showToast('Statut mis à jour', 'success')
         },
         onError: (err) => {
             showToast(err.response?.data?.detail || 'Erreur', 'error')
@@ -74,13 +75,29 @@ export default function StudentDashboard() {
         <div className="space-y-6">
             {/* Header */}
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                <div>
-                    <h1 className="text-2xl font-bold text-neutral-900">
-                        Bonjour, {profile?.first_name} 👋
-                    </h1>
-                    <p className="text-neutral-500 mt-1">
-                        Gérez vos entretiens et inscriptions
-                    </p>
+                <div className="flex items-center gap-4">
+                    <div>
+                        <h1 className="text-2xl font-bold text-neutral-900">
+                            Bonjour, {profile?.first_name} 👋
+                        </h1>
+                        <p className="text-neutral-500 mt-1">
+                            Gérez vos entretiens et inscriptions
+                        </p>
+                    </div>
+                    <div className={`hidden sm:flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium ${isConnected ? 'bg-success-50 text-success-600 border border-success-100' : 'bg-neutral-50 text-neutral-400 border border-neutral-100'}`}>
+                        <div className={`w-2 h-2 rounded-full ${isConnected ? 'bg-success-500 animate-pulse' : 'bg-neutral-300'}`} />
+                        {isConnected ? 'Temps Réel' : (
+                            <div className="flex items-center gap-2">
+                                <span>Déconnecté</span>
+                                <button
+                                    onClick={() => wsClient.reconnect()}
+                                    className="text-primary-600 hover:text-primary-700 font-bold underline"
+                                >
+                                    Reconnecter
+                                </button>
+                            </div>
+                        )}
+                    </div>
                 </div>
 
                 {/* Status control */}

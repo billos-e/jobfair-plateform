@@ -39,6 +39,8 @@ class Company(models.Model):
     )
     # R9: Default 1 slot, only admin can modify
     max_concurrent_interviews = models.PositiveIntegerField(default=1)
+    # Optional: limit number of students in queue
+    max_queue_size = models.PositiveIntegerField(null=True, blank=True, default=None)
     created_at = models.DateTimeField(auto_now_add=True)
     
     class Meta:

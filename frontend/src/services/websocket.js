@@ -107,9 +107,21 @@ class WebSocketClient {
         const delay = this.reconnectDelay * Math.pow(2, this.reconnectAttempts - 1)
         console.log(`Reconnecting in ${delay}ms (attempt ${this.reconnectAttempts})`)
 
-        setTimeout(() => {
+        this.reconnectTimer = setTimeout(() => {
             this.connect(this.authToken, this.companyToken)
         }, delay)
+    }
+
+    /**
+     * Manual reconnection trigger
+     */
+    reconnect() {
+        if (this.reconnectTimer) {
+            clearTimeout(this.reconnectTimer)
+            this.reconnectTimer = null
+        }
+        this.reconnectAttempts = 0
+        this.connect(this.authToken, this.companyToken)
     }
 
     /**

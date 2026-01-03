@@ -62,7 +62,7 @@ export default function AdminStudents() {
         mutationFn: ({ id, status }) => adminAPI.updateStudent(id, { status }),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin-students'] })
-            showToast('Statut mis à jour', 'success')
+            // showToast('Statut mis à jour', 'success')
             setEditingId(null)
         },
         onError: () => showToast('Erreur mise à jour', 'error')

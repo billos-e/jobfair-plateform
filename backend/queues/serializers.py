@@ -42,6 +42,18 @@ class QueueCreateSerializer(serializers.ModelSerializer):
                     'company': "Vous êtes déjà inscrit chez cette entreprise."
                 })
         
+        # Check max queue size
+        if company.max_queue_size:
+            current_queue_size = Queue.objects.filter(
+                company=company,
+                is_completed=False
+            ).count()
+            
+            if current_queue_size >= company.max_queue_size:
+                raise serializers.ValidationError({
+                    'company': f"La file d'attente est complète ({company.max_queue_size} pers. max)."
+                })
+
         return attrs
     
     def create(self, validated_data):

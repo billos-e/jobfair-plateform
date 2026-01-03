@@ -36,16 +36,24 @@ class CompanyDashboardSerializer(serializers.ModelSerializer):
     class Meta:
         model = Company
         fields = [
-            'id', 'name', 'status', 'max_concurrent_interviews',
+            'id', 'name', 'status', 
+            'max_concurrent_interviews', 'max_queue_size',
             'current_interview_count', 'available_slots', 'created_at'
         ]
-        read_only_fields = ['id', 'name', 'max_concurrent_interviews', 'created_at']
+        read_only_fields = ['id', 'name', 'created_at']
     
     def get_current_interview_count(self, obj):
         return obj.get_current_interview_count()
     
     def get_available_slots(self, obj):
         return obj.get_available_slots()
+
+
+class CompanySettingsSerializer(serializers.ModelSerializer):
+    """Serializer for updating company settings"""
+    class Meta:
+        model = Company
+        fields = ['max_concurrent_interviews', 'max_queue_size']
 
 
 class CompanyStatusSerializer(serializers.Serializer):
@@ -73,8 +81,8 @@ class CompanyAdminSerializer(serializers.ModelSerializer):
         model = Company
         fields = [
             'id', 'name', 'access_token', 'access_url', 'status',
-            'max_concurrent_interviews', 'current_interview_count',
-            'queue_length', 'created_at'
+            'max_concurrent_interviews', 'max_queue_size',
+            'current_interview_count', 'queue_length', 'created_at'
         ]
         read_only_fields = ['id', 'access_token', 'access_url', 'created_at',
                            'current_interview_count', 'queue_length']
@@ -95,5 +103,6 @@ class CompanyCreateSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Company
-        fields = ['id', 'name', 'max_concurrent_interviews', 'access_token']
+        fields = ['id', 'name', 'max_concurrent_interviews', 'max_queue_size', 'access_token']
         read_only_fields = ['id', 'access_token']
+
