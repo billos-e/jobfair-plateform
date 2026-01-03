@@ -35,4 +35,5 @@ typing_extensions==4.15.0
 ujson==5.11.0
 zope.interface==8.1.1
 psycopg2-binary
-whitenoisedj-database-url
+whitenoise
+dj-database-url
