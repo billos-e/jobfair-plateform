@@ -89,23 +89,10 @@ DATABASE_URL = config('DATABASE_URL', default='')
 if DATABASE_URL:
     # Production: PostgreSQL
     import dj_database_url
-    from urllib.parse import urlparse, urlunparse, parse_qs, urlencode
-
-    # Supabase pgbouncer fix: manually strip the parameter if present
-    # dj_database_url passes unknown query params to OPTIONS which fails in psycopg2
-    parsed_url = urlparse(DATABASE_URL)
-    query = parse_qs(parsed_url.query)
-    query.pop('pgbouncer', None)
-    
-    clean_query = urlencode(query, doseq=True)
-    clean_url = urlunparse(
-        (parsed_url.scheme, parsed_url.netloc, parsed_url.path, 
-         parsed_url.params, clean_query, parsed_url.fragment)
-    )
-
+    # Supabase pgbouncer fix: pop the parameter if present to avoid psycopg2 error
     DATABASES = {
         'default': dj_database_url.config(
-            default=clean_url,
+            default=DATABASE_URL,
             conn_max_age=600,
             conn_health_checks=True,
         )
