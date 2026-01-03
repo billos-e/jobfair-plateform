@@ -92,7 +92,7 @@ if DATABASE_URL:
     # Supabase pgbouncer fix: pop the parameter if present to avoid psycopg2 error
     DATABASES = {
         'default': dj_database_url.config(
-            default=os.environ.get('DATABASE_URL'), #DATABASE_URL,
+            default=DATABASE_URL,
             conn_max_age=600,
             conn_health_checks=True,
         )
