@@ -2,7 +2,27 @@
  * WebSocket client for real-time notifications
  */
 
-const WS_URL = import.meta.env.VITE_WS_URL || 'ws://localhost:8000/ws/notifications/'
+// Helper to determine WebSocket URL from API URL
+const getWebSocketUrl = () => {
+    // 1. Explicit WS URL
+    if (import.meta.env.VITE_WS_URL) {
+        return import.meta.env.VITE_WS_URL
+    }
+
+    // 2. Derive from API URL
+    const apiUrl = import.meta.env.VITE_API_URL
+    if (apiUrl) {
+        const wsProtocol = apiUrl.startsWith('https') ? 'wss' : 'ws'
+        // Remove protocol and /api suffix to get host
+        const host = apiUrl.replace(/^https?:\/\//, '').replace(/\/api\/?$/, '')
+        return `${wsProtocol}://${host}/ws/notifications/`
+    }
+
+    // 3. Fallback to localhost
+    return 'ws://localhost:8000/ws/notifications/'
+}
+
+const WS_URL = getWebSocketUrl()
 
 class WebSocketClient {
     constructor() {
