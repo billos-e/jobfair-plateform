@@ -61,12 +61,43 @@ function CompanyRoute({ children }) {
     return children
 }
 
+/**
+ * Public Only Route wrapper
+ * Redirects to dashboard if already authenticated
+ */
+function PublicOnlyRoute({ children }) {
+    const { user, isLoading } = useAuth()
+
+    if (isLoading) {
+        return (
+            <div className="min-h-screen flex items-center justify-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500"></div>
+            </div>
+        )
+    }
+
+    if (user) {
+        if (user.role === 'admin') return <Navigate to="/admin" replace />
+        return <Navigate to="/dashboard" replace />
+    }
+
+    return children
+}
+
 function App() {
     return (
         <Routes>
             {/* Public routes */}
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
+            <Route path="/login" element={
+                <PublicOnlyRoute>
+                    <Login />
+                </PublicOnlyRoute>
+            } />
+            <Route path="/register" element={
+                <PublicOnlyRoute>
+                    <Register />
+                </PublicOnlyRoute>
+            } />
 
             {/* Student routes */}
             <Route
