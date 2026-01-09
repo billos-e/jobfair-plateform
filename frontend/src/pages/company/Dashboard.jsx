@@ -143,7 +143,10 @@ export default function CompanyDashboard() {
                                 </div>
                             )}
                         </div>
-                        <h1 className="text-xl font-bold text-neutral-900">{company.name}</h1>
+                        <h1 className="text-xl font-bold text-neutral-900 flex items-center gap-2">
+                            <img src="/logo.png" alt="Logo" className="h-8 w-8 object-contain" />
+                            {company.name}
+                        </h1>
                     </div>
 
                     {/* Status controls */}

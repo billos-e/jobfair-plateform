@@ -86,7 +86,7 @@ export default function AdminDashboard() {
             </div>
 
             {/* Stats Grid */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 <Card className="text-center">
                     <Users className="mx-auto text-primary-500 mb-2" size={32} />
                     <div className="text-3xl font-bold text-neutral-900">{stats?.total_students || 0}</div>
