@@ -28,7 +28,7 @@ export default function AdminLayout() {
                     <div className="flex justify-between h-16">
                         <div className="flex">
                             <div className="flex-shrink-0 flex items-center gap-2">
-                                <img src="/logo.png" alt="Logo" className="h-8 w-8 object-contain" />
+                                <img src="/logo.png" alt="Logo" className="h-10 w-10 object-contain" />
                                 <h1 className="text-xl font-bold bg-gradient-to-r from-primary-600 to-primary-400 bg-clip-text text-transparent">
                                     JobFair Admin
                                 </h1>

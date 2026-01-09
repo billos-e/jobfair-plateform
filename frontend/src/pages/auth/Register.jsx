@@ -62,8 +62,11 @@ export default function Register() {
         <div className="min-h-screen bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center p-4">
             <Card className="w-full max-w-md" padding="lg">
                 <div className="text-center mb-8">
-                    <h1 className="text-2xl font-bold text-primary-500">JobFair</h1>
-                    <p className="text-neutral-500 mt-2">Créez votre compte étudiant</p>
+                    <div className="flex items-center justify-center gap-3 mb-2">
+                        <img src="/logo.png" alt="Logo" className="h-12 w-12 object-contain" />
+                        <h1 className="text-3xl font-bold text-primary-500">JobFair</h1>
+                    </div>
+                    <p className="text-neutral-500">Créez votre compte étudiant</p>
                 </div>
 
                 <form onSubmit={handleSubmit} className="space-y-4">

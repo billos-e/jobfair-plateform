@@ -144,7 +144,7 @@ export default function CompanyDashboard() {
                             )}
                         </div>
                         <h1 className="text-xl font-bold text-neutral-900 flex items-center gap-2">
-                            <img src="/logo.png" alt="Logo" className="h-8 w-8 object-contain" />
+                            <img src="/logo.png" alt="Logo" className="h-10 w-10 object-contain" />
                             {company.name}
                         </h1>
                     </div>

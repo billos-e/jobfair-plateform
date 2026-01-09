@@ -56,7 +56,7 @@ export default function MainLayout({ children }) {
 
                     {/* Logo */}
                     <Link to="/" className="flex items-center gap-2">
-                        <img src="/logo.png" alt="Logo" className="h-8 w-8 object-contain" />
+                        <img src="/logo.png" alt="Logo" className="h-10 w-10 object-contain" />
                         <span className="text-xl font-bold text-primary-500">JobFair</span>
                         <span className="text-sm text-neutral-500 hidden sm:block">Platform</span>
                     </Link>

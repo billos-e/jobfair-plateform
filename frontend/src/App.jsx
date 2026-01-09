@@ -1,5 +1,6 @@
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { useAuth } from './contexts/AuthContext'
+import LogoLoader from './components/ui/LogoLoader'
 
 // Layouts
 import MainLayout from './components/layout/MainLayout'
@@ -34,7 +35,7 @@ function ProtectedRoute({ children, allowedRoles }) {
     if (isLoading) {
         return (
             <div className="min-h-screen flex items-center justify-center">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500"></div>
+                <LogoLoader />
             </div>
         )
     }
@@ -71,7 +72,7 @@ function PublicOnlyRoute({ children }) {
     if (isLoading) {
         return (
             <div className="min-h-screen flex items-center justify-center">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500"></div>
+                <LogoLoader />
             </div>
         )
     }
