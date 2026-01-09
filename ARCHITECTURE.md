@@ -70,7 +70,7 @@ erDiagram
         string first_name
         string last_name
         string status
-        int current_company_id FK_NULL
+        int current_company_id FK
     }
     
     COMPANY {
