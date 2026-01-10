@@ -10,6 +10,7 @@ import Card, { CardTitle } from '../../components/ui/Card'
 import Button from '../../components/ui/Button'
 import { StatusBadge } from '../../components/ui/Badge'
 import { useToast } from '../../contexts/ToastContext'
+import LogoLoader from '../../components/ui/LogoLoader'
 import { ArrowLeft, Save, RefreshCw, Trash2, Users, Clock, Play, Pause, ChevronUp, ChevronDown, CheckCircle, Plus, Search, X, Copy } from 'lucide-react'
 
 export default function AdminCompanyDetail() {
@@ -122,7 +123,7 @@ export default function AdminCompanyDetail() {
         onError: () => showToast('Erreur mise à jour étudiant', 'error')
     })
 
-    if (isLoadingCompany || isLoadingQueue) return <div className="text-center py-8">Chargement...</div>
+    if (isLoadingCompany || isLoadingQueue) return <div className="text-center py-12"><LogoLoader /></div>
     if (!company) return <div className="text-center py-8">Entreprise introuvable</div>
 
     const startEditing = () => {
@@ -427,7 +428,7 @@ function AddStudentModal({ onClose, onSelect }) {
                 </div>
 
                 <div className="overflow-y-auto flex-1 space-y-2 min-h-[200px]">
-                    {isLoading ? <div className="text-center py-4">Chargement...</div> : (
+                    {isLoading ? <div className="text-center py-4"><LogoLoader className="h-12 w-12 mx-auto" /></div> : (
                         filtered?.length === 0 ? <p className="text-center text-neutral-400 py-4">Aucun étudiant trouvé</p> : (
                             filtered?.map(student => (
                                 <div key={student.id} className="flex justify-between items-center p-2 hover:bg-neutral-50 rounded border border-transparent hover:border-neutral-200">

@@ -10,7 +10,8 @@ import Card from '../../components/ui/Card'
 import Button from '../../components/ui/Button'
 import { StatusBadge } from '../../components/ui/Badge'
 import { useToast } from '../../contexts/ToastContext'
-import { ChevronDown, ChevronUp, Play, Pause, Users, Clock, Loader2, AlertCircle, Copy, Link as LinkIcon, ExternalLink, Zap } from 'lucide-react'
+import LogoLoader from '../../components/ui/LogoLoader'
+import { ChevronDown, ChevronUp, Play, Pause, Users, Clock, AlertCircle, Copy, Link as LinkIcon, ExternalLink, Zap } from 'lucide-react'
 import { useWebSocket } from '../../contexts/WebSocketContext'
 
 export default function AdminManagement() {
@@ -50,8 +51,8 @@ export default function AdminManagement() {
 
     if (isLoading) {
         return (
-            <div className="flex items-center justify-center h-64">
-                <Loader2 className="animate-spin text-primary-500" size={32} />
+            <div className="flex items-center justify-center min-h-[400px]">
+                <LogoLoader />
             </div>
         )
     }
@@ -204,7 +205,7 @@ function CompanyQueueDetails({ companyId }) {
         }
     })
 
-    if (isLoading) return <div className="text-center py-4"><Loader2 className="animate-spin inline mr-2" /> Chargement...</div>
+    if (isLoading) return <div className="text-center py-12"><LogoLoader className="h-16 w-16 mx-auto mb-2" /> Chargement...</div>
     if (error) return <div className="text-danger-500 py-4"><AlertCircle className="inline mr-2" /> Erreur chargement</div>
 
     const { in_interview, waiting } = data

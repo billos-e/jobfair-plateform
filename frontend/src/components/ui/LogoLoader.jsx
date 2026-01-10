@@ -1,6 +1,6 @@
 import React from 'react'
 
-export default function LogoLoader({ className = "h-24 w-24" }) {
+export default function LogoLoader({ className = "h-32 w-32" }) {
     return (
         <div className="flex items-center justify-center">
             <img

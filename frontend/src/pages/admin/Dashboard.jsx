@@ -8,7 +8,8 @@ import { useWebSocket } from '../../contexts/WebSocketContext'
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Card, { CardTitle } from '../../components/ui/Card'
-import { Users, Building2, Clock, Activity, Loader2 } from 'lucide-react'
+import LogoLoader from '../../components/ui/LogoLoader'
+import { Users, Building2, Clock, Activity } from 'lucide-react'
 
 export default function AdminDashboard() {
     const navigate = useNavigate()
@@ -56,8 +57,8 @@ export default function AdminDashboard() {
 
     if (isLoading) {
         return (
-            <div className="flex items-center justify-center h-64">
-                <Loader2 className="animate-spin text-primary-500" size={32} />
+            <div className="flex items-center justify-center min-h-[400px]">
+                <LogoLoader />
             </div>
         )
     }

@@ -8,6 +8,7 @@ import Card, { CardTitle } from '../../components/ui/Card'
 import Button from '../../components/ui/Button'
 import { StatusBadge } from '../../components/ui/Badge'
 import { useToast } from '../../contexts/ToastContext'
+import LogoLoader from '../../components/ui/LogoLoader'
 import { Play, Pause, Clock, Building2, ChevronRight, Zap } from 'lucide-react'
 import { useWebSocket } from '../../contexts/WebSocketContext'
 
@@ -63,8 +64,8 @@ export default function StudentDashboard() {
 
     if (profileLoading) {
         return (
-            <div className="flex items-center justify-center h-64">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500"></div>
+            <div className="flex items-center justify-center min-h-[400px]">
+                <LogoLoader />
             </div>
         )
     }

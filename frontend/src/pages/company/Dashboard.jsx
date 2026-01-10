@@ -10,6 +10,7 @@ import { wsClient } from '../../services/websocket'
 import Card, { CardTitle } from '../../components/ui/Card'
 import Button from '../../components/ui/Button'
 import { StatusBadge } from '../../components/ui/Badge'
+import LogoLoader from '../../components/ui/LogoLoader'
 import { Play, Pause, UserCheck, Clock, Users, Check, Settings } from 'lucide-react'
 
 export default function CompanyDashboard() {
@@ -103,7 +104,7 @@ export default function CompanyDashboard() {
     if (isLoading) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-neutral-50">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500"></div>
+                <LogoLoader />
             </div>
         )
     }

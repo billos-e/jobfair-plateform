@@ -11,6 +11,7 @@ import Input from '../../components/ui/Input'
 import { StatusBadge } from '../../components/ui/Badge'
 import { useToast } from '../../contexts/ToastContext'
 import { useWebSocket } from '../../contexts/WebSocketContext'
+import LogoLoader from '../../components/ui/LogoLoader'
 import { Search, Trash2, Edit2, Check, X } from 'lucide-react'
 
 export default function AdminStudents() {
@@ -74,7 +75,7 @@ export default function AdminStudents() {
     )
 
     if (isLoading) {
-        return <div className="p-8 text-center">Chargement...</div>
+        return <div className="p-12 text-center"><LogoLoader /></div>
     }
 
     return (

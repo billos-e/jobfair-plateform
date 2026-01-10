@@ -9,6 +9,7 @@ import Button from '../../components/ui/Button'
 import { StatusBadge } from '../../components/ui/Badge'
 import { useToast } from '../../contexts/ToastContext'
 import { useWebSocket } from '../../contexts/WebSocketContext'
+import LogoLoader from '../../components/ui/LogoLoader'
 import { Building2, Users, Clock, Plus, Check, Zap, MapPin } from 'lucide-react'
 
 export default function StudentCompanies() {
@@ -54,8 +55,8 @@ export default function StudentCompanies() {
 
     if (isLoading) {
         return (
-            <div className="flex items-center justify-center h-64">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500"></div>
+            <div className="flex items-center justify-center min-h-[400px]">
+                <LogoLoader />
             </div>
         )
     }

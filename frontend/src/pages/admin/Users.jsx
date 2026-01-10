@@ -11,6 +11,7 @@ import Button from '../../components/ui/Button'
 import Input from '../../components/ui/Input'
 import { StatusBadge } from '../../components/ui/Badge'
 import { useToast } from '../../contexts/ToastContext'
+import LogoLoader from '../../components/ui/LogoLoader'
 import { Search, Trash2, Plus, Users, Building2, ChevronRight, Copy, RefreshCw, Play, Pause } from 'lucide-react'
 
 export default function AdminUsers() {
@@ -82,7 +83,7 @@ function StudentsList() {
         s.last_name.toLowerCase().includes(search.toLowerCase())
     )
 
-    if (isLoading) return <div className="text-center py-8">Chargement...</div>
+    if (isLoading) return <div className="text-center py-12"><LogoLoader /></div>
 
     return (
         <div className="space-y-4">
@@ -201,7 +202,7 @@ function CompaniesList() {
         c.name.toLowerCase().includes(search.toLowerCase())
     )
 
-    if (isLoading) return <div className="text-center py-8">Chargement...</div>
+    if (isLoading) return <div className="text-center py-12"><LogoLoader /></div>
 
     return (
         <div className="space-y-4">
