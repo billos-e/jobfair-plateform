@@ -10,6 +10,7 @@ import Card, { CardTitle } from '../../components/ui/Card'
 import Button from '../../components/ui/Button'
 import { StatusBadge } from '../../components/ui/Badge'
 import { useToast } from '../../contexts/ToastContext'
+import LogoLoader from '../../components/ui/LogoLoader'
 import { ArrowLeft, User, Mail, Trash2, Save, X, Hash, Play, Pause, ChevronUp, ChevronDown } from 'lucide-react'
 
 export default function AdminStudentDetail() {
@@ -64,7 +65,7 @@ export default function AdminStudentDetail() {
         onError: () => showToast('Erreur position', 'error')
     })
 
-    if (isLoading) return <div className="text-center py-8">Chargement...</div>
+    if (isLoading) return <div className="text-center py-12"><LogoLoader /></div>
     if (!student) return <div className="text-center py-8">Étudiant introuvable</div>
 
     // Helper to change position locally before saving (optional, but let's do direct prompt or input)

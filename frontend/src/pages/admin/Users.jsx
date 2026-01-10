@@ -11,6 +11,7 @@ import Button from '../../components/ui/Button'
 import Input from '../../components/ui/Input'
 import { StatusBadge } from '../../components/ui/Badge'
 import { useToast } from '../../contexts/ToastContext'
+import LogoLoader from '../../components/ui/LogoLoader'
 import { Search, Trash2, Plus, Users, Building2, ChevronRight, Copy, RefreshCw, Play, Pause } from 'lucide-react'
 
 export default function AdminUsers() {
@@ -82,12 +83,12 @@ function StudentsList() {
         s.last_name.toLowerCase().includes(search.toLowerCase())
     )
 
-    if (isLoading) return <div className="text-center py-8">Chargement...</div>
+    if (isLoading) return <div className="text-center py-12"><LogoLoader /></div>
 
     return (
         <div className="space-y-4">
-            <div className="flex justify-between">
-                <div className="relative w-64">
+            <div className="flex flex-col sm:flex-row gap-4 sm:items-center justify-between">
+                <div className="relative w-full sm:w-64">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400" size={18} />
                     <Input
                         placeholder="Rechercher un étudiant..."
@@ -99,6 +100,7 @@ function StudentsList() {
                 <Button
                     variant="outline"
                     icon={RefreshCw}
+                    className="w-full sm:w-auto"
                     onClick={() => {
                         if (confirm('Passer TOUS les étudiants à disponible ?')) bulkAvailableMutation.mutate()
                     }}
@@ -108,48 +110,50 @@ function StudentsList() {
             </div>
 
             <Card padding="none" className="overflow-hidden">
-                <table className="w-full text-left">
-                    <thead className="bg-neutral-50 border-b border-neutral-200">
-                        <tr>
-                            <th className="px-6 py-4 font-medium text-neutral-500">Nom</th>
-                            <th className="px-6 py-4 font-medium text-neutral-500">Email</th>
-                            <th className="px-6 py-4 font-medium text-neutral-500">Statut</th>
-                            <th className="px-6 py-4 font-medium text-neutral-500 text-right">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody className="divide-y divide-neutral-100">
-                        {filteredStudents?.map((student) => (
-                            <tr
-                                key={student.id}
-                                className="hover:bg-neutral-50 cursor-pointer group"
-                                onClick={() => navigate(`/admin/students/${student.id}`)}
-                            >
-                                <td className="px-6 py-4 font-medium text-neutral-900 group-hover:text-primary-600 transition-colors">
-                                    {student.first_name} {student.last_name}
-                                </td>
-                                <td className="px-6 py-4 text-neutral-500">
-                                    {student.email}
-                                </td>
-                                <td className="px-6 py-4">
-                                    <StatusBadge status={student.status} />
-                                </td>
-                                <td className="px-6 py-4 text-right" onClick={(e) => e.stopPropagation()}>
-                                    <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        className="text-danger-500 hover:text-danger-700 hover:bg-danger-50"
-                                        onClick={() => {
-                                            if (confirm('Supprimer cet étudiant ?')) deleteMutation.mutate(student.id)
-                                        }}
-                                    >
-                                        <Trash2 size={16} />
-                                    </Button>
-                                    <ChevronRight size={16} className="inline-block ml-2 text-neutral-300" />
-                                </td>
+                <div className="overflow-x-auto">
+                    <table className="w-full text-left">
+                        <thead className="bg-neutral-50 border-b border-neutral-200">
+                            <tr>
+                                <th className="px-6 py-4 font-medium text-neutral-500">Nom</th>
+                                <th className="px-6 py-4 font-medium text-neutral-500">Email</th>
+                                <th className="px-6 py-4 font-medium text-neutral-500">Statut</th>
+                                <th className="px-6 py-4 font-medium text-neutral-500 text-right">Actions</th>
                             </tr>
-                        ))}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody className="divide-y divide-neutral-100">
+                            {filteredStudents?.map((student) => (
+                                <tr
+                                    key={student.id}
+                                    className="hover:bg-neutral-50 cursor-pointer group"
+                                    onClick={() => navigate(`/admin/students/${student.id}`)}
+                                >
+                                    <td className="px-6 py-4 font-medium text-neutral-900 group-hover:text-primary-600 transition-colors">
+                                        {student.first_name} {student.last_name}
+                                    </td>
+                                    <td className="px-6 py-4 text-neutral-500">
+                                        {student.email}
+                                    </td>
+                                    <td className="px-6 py-4">
+                                        <StatusBadge status={student.status} />
+                                    </td>
+                                    <td className="px-6 py-4 text-right" onClick={(e) => e.stopPropagation()}>
+                                        <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            className="text-danger-500 hover:text-danger-700 hover:bg-danger-50"
+                                            onClick={() => {
+                                                if (confirm('Supprimer cet étudiant ?')) deleteMutation.mutate(student.id)
+                                            }}
+                                        >
+                                            <Trash2 size={16} />
+                                        </Button>
+                                        <ChevronRight size={16} className="inline-block ml-2 text-neutral-300" />
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
             </Card>
         </div>
     )
@@ -198,12 +202,12 @@ function CompaniesList() {
         c.name.toLowerCase().includes(search.toLowerCase())
     )
 
-    if (isLoading) return <div className="text-center py-8">Chargement...</div>
+    if (isLoading) return <div className="text-center py-12"><LogoLoader /></div>
 
     return (
         <div className="space-y-4">
-            <div className="flex justify-between">
-                <div className="relative w-64">
+            <div className="flex flex-col sm:flex-row gap-4 sm:items-center justify-between">
+                <div className="relative w-full sm:w-64">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400" size={18} />
                     <Input
                         placeholder="Rechercher une entreprise..."
@@ -212,17 +216,18 @@ function CompaniesList() {
                         onChange={(e) => setSearch(e.target.value)}
                     />
                 </div>
-                <div className="flex gap-2">
+                <div className="flex gap-2 w-full sm:w-auto">
                     <Button
                         variant="outline"
                         icon={Play}
+                        className="flex-1 sm:flex-none"
                         onClick={() => {
                             if (confirm('Lancer le recrutement pour TOUTES les entreprises ?')) bulkResumeMutation.mutate()
                         }}
                     >
                         Tout lancer
                     </Button>
-                    <Button onClick={() => setIsCreateModalOpen(true)} icon={Plus}>Ajouter</Button>
+                    <Button className="flex-1 sm:flex-none" onClick={() => setIsCreateModalOpen(true)} icon={Plus}>Ajouter</Button>
                 </div>
             </div>
 
@@ -273,48 +278,50 @@ function CompaniesList() {
             )}
 
             <Card padding="none" className="overflow-hidden">
-                <table className="w-full text-left">
-                    <thead className="bg-neutral-50 border-b border-neutral-200">
-                        <tr>
-                            <th className="px-6 py-4 font-medium text-neutral-500">Nom</th>
-                            <th className="px-6 py-4 font-medium text-neutral-500">Statut</th>
-                            <th className="px-6 py-4 font-medium text-neutral-500 text-center">Interactions</th>
-                            <th className="px-6 py-4 font-medium text-neutral-500 text-right">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody className="divide-y divide-neutral-100">
-                        {filteredCompanies?.map((company) => (
-                            <tr
-                                key={company.id}
-                                className="hover:bg-neutral-50 cursor-pointer group"
-                                onClick={() => navigate(`/admin/companies/${company.id}`)}
-                            >
-                                <td className="px-6 py-4 font-medium text-neutral-900 group-hover:text-primary-600 transition-colors">
-                                    {company.name}
-                                </td>
-                                <td className="px-6 py-4">
-                                    <StatusBadge status={company.status} />
-                                </td>
-                                <td className="px-6 py-4 text-center text-sm text-neutral-500">
-                                    {company.current_interview_count} actifs / {company.queue_length} file
-                                </td>
-                                <td className="px-6 py-4 text-right" onClick={(e) => e.stopPropagation()}>
-                                    <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        className="text-danger-500 hover:text-danger-700 hover:bg-danger-50"
-                                        onClick={() => {
-                                            if (confirm('Supprimer cette entreprise ?')) deleteMutation.mutate(company.id)
-                                        }}
-                                    >
-                                        <Trash2 size={16} />
-                                    </Button>
-                                    <ChevronRight size={16} className="inline-block ml-2 text-neutral-300" />
-                                </td>
+                <div className="overflow-x-auto">
+                    <table className="w-full text-left">
+                        <thead className="bg-neutral-50 border-b border-neutral-200">
+                            <tr>
+                                <th className="px-6 py-4 font-medium text-neutral-500">Nom</th>
+                                <th className="px-6 py-4 font-medium text-neutral-500">Statut</th>
+                                <th className="px-6 py-4 font-medium text-neutral-500 text-center">Interactions</th>
+                                <th className="px-6 py-4 font-medium text-neutral-500 text-right">Actions</th>
                             </tr>
-                        ))}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody className="divide-y divide-neutral-100">
+                            {filteredCompanies?.map((company) => (
+                                <tr
+                                    key={company.id}
+                                    className="hover:bg-neutral-50 cursor-pointer group"
+                                    onClick={() => navigate(`/admin/companies/${company.id}`)}
+                                >
+                                    <td className="px-6 py-4 font-medium text-neutral-900 group-hover:text-primary-600 transition-colors">
+                                        {company.name}
+                                    </td>
+                                    <td className="px-6 py-4">
+                                        <StatusBadge status={company.status} />
+                                    </td>
+                                    <td className="px-6 py-4 text-center text-sm text-neutral-500">
+                                        {company.current_interview_count} actifs / {company.queue_length} file
+                                    </td>
+                                    <td className="px-6 py-4 text-right" onClick={(e) => e.stopPropagation()}>
+                                        <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            className="text-danger-500 hover:text-danger-700 hover:bg-danger-50"
+                                            onClick={() => {
+                                                if (confirm('Supprimer cette entreprise ?')) deleteMutation.mutate(company.id)
+                                            }}
+                                        >
+                                            <Trash2 size={16} />
+                                        </Button>
+                                        <ChevronRight size={16} className="inline-block ml-2 text-neutral-300" />
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
             </Card>
         </div>
     )
