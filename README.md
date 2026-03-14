@@ -2,6 +2,8 @@
 
 Plateforme de gestion de files d'attente pour salons de l'emploi, permettant aux étudiants de s'inscrire aux entretiens avec les entreprises et de gérer leur passage en temps réel.
 
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/billos-e/jobfair-plateform)
+
 ## 📋 Vue d'ensemble
 
 Cette plateforme facilite l'organisation de salons de l'emploi en permettant :
